@@ -1,1 +1,1 @@
-# -Epitech-MJS-My_chat-
+# Epitech-MJS-My_chat
