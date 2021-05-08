@@ -1,20 +1,37 @@
-version: "3"
-
+version: '3.3'
 services:
-  backend:
-    container_name: Elian_Back
+  api:
+    container_name: api
     build:
-      context: ./
-      dockerfile: DockerFile
+      context:  .
+      dockerfile: ./Dockerfile
+    environment:
+      PORT: 8080
     volumes:
-      - ./:/usr/app
+      - './:/usr/src/app'
+      - '/usr/src/app/node_modules'
     ports:
-      - "8080:8080"
+      - '8080:8080'
     links:
       - mongo
+    depends_on:
+      - mongo
+    build:
+      context: ./
+
   mongo:
-    container_name: mongo
     image: mongo
-    command: mongod --port 27030
     ports:
-      - '27030:27030'
+      - '27017:27017'
+    volumes:
+      - /data/db
+    command:
+      - mongod
+  mongo-admin:
+    image: mongo-express
+    ports:
+      - '8081:8081'
+    links:
+      - mongo
+    depends_on:
+      - mongo

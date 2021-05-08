@@ -33,7 +33,7 @@ function createUserSchema(body, hash) {
 }
 
 router.post('/signup', (req, res, next) => {
-    User.find({email: req.body.email})
+    User.find({ email: req.body.email })
         .exec()
         .then(user => {
             if (user.length >= 1) {
@@ -41,9 +41,9 @@ router.post('/signup', (req, res, next) => {
                     'Mail exists'
                 )
             } else {
-                User.find({username: req.body.username})
+                User.find({ username: req.body.username })
                     .exec()
-                    .then(username =>  {
+                    .then(username => {
                         if (username.length >= 1) {
                             return res.status(409).json(
                                 'Username exists'
@@ -81,7 +81,7 @@ router.post('/signup', (req, res, next) => {
                                                     };
                                                     transporter.sendMail(mailOptions, function (err) {
                                                         if (err)
-                                                            return res.status(500).send({msg: 'Technical Issue!, Please click on resend for verify your Email.'});
+                                                            return res.status(500).send({ msg: 'Technical Issue!, Please click on resend for verify your Email.' });
                                                         return 'A verification email has been sent to ' + user.email + '. It will be expire after one day. If you not get verification Email click on resend token.';
                                                     });
                                                 })
@@ -116,13 +116,13 @@ router.get('/confirmation/:email/:token', (req, res, next) => {
     Token.findOne({ token: req.params.token }, function (err, token) {
         // token is not found into database i.e. token may have expired
         if (!token) {
-            return res.status(400).send({msg:'Your verification link may have expired. Please click on resend for verify your Email.'});
+            return res.status(400).send({ msg: 'Your verification link may have expired. Please click on resend for verify your Email.' });
         } else {
             // if token is found then check valid user
             User.findOne({ _id: token._userId, email: req.params.email }, function (err, user) {
                 // not valid user
                 if (!user) {
-                    return res.status(401).send({msg:'We were unable to find a user for this verification. Please SignUp!'});
+                    return res.status(401).send({ msg: 'We were unable to find a user for this verification. Please SignUp!' });
                 }
                 // user is already verified
                 else if (user.active) {
@@ -135,10 +135,10 @@ router.get('/confirmation/:email/:token', (req, res, next) => {
                     user.save(function (err) {
                         // error occur
                         if (err) {
-                            return res.status(500).send({msg: err.message});
+                            return res.status(500).send({ msg: err.message });
                         }
                         // account successfully verified
-                        else{
+                        else {
                             return res.status(200).send('Your account has been successfully verified');
                         }
                     });
@@ -150,7 +150,7 @@ router.get('/confirmation/:email/:token', (req, res, next) => {
 });
 
 router.post('/login', (req, res, next) => {
-    User.find({ "$or": [ {email : req.body.email }, {username : req.body.email} ]})
+    User.find({ "$or": [{ email: req.body.email }, { username: req.body.email }] })
         .exec()
         .then(user => {
             // if (user.length < 1) {
@@ -171,9 +171,9 @@ router.post('/login', (req, res, next) => {
                 }
                 if (result) {
                     const token = jwt.sign({
-                            email: user[0].email,
-                            userId: user[0]._id
-                        },
+                        email: user[0].email,
+                        userId: user[0]._id
+                    },
                         process.env.JWT_KEY,
                         {
                             expiresIn: "3h"
@@ -196,7 +196,7 @@ router.post('/login', (req, res, next) => {
 });
 
 router.delete('/:userId', checkAuth, (req, res, next) => {
-    User.remove({id: req.params.userId})
+    User.remove({ id: req.params.userId })
         .exec()
         .then(result => {
             res.status(200).json({
