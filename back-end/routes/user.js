@@ -254,7 +254,7 @@ router.delete('/:userId', checkAuth, (req, res, next) => {
 });
 
 router.put('/forgotpassword', (req, res, next) => {
-    User.find({email: req.body.email})
+    User.find({"$or": [{email: req.body.username}, {username: req.body.username}]})
         .exec()
         .then(user => {
             if (!user) {
