@@ -80,8 +80,8 @@ router.post('/signup', (req, res, next) => {
                                                         text: 'Hello ' + req.body.name + ',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/user\/confirmation\/' + user.email + '\/' + token.token + '\n\nThank You!\n'
                                                     };
                                                     transporter.sendMail(mailOptions, function (err) {
-                                                        if (err)
-                                                            return res.status(500).send({ msg: 'Technical Issue!, Please click on resend for verify your Email.' });
+                                                        // if (err)
+                                                            //return res.status(500).send({ msg: 'Technical Issue!, Please click on resend for verify your Email.' });
                                                         return 'A verification email has been sent to ' + user.email + '. It will be expire after one day. If you not get verification Email click on resend token.';
                                                     });
                                                 })
@@ -150,7 +150,8 @@ router.get('/confirmation/:email/:token', (req, res, next) => {
 });
 
 router.post('/login', (req, res, next) => {
-    User.find({ "$or": [{ email: req.body.email }, { username: req.body.email }] })
+    console.log(req.body);
+    User.find({ "$or": [{ email: req.body.username }, { username: req.body.username }] })
         .exec()
         .then(user => {
             // if (user.length < 1) {

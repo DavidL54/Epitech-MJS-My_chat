@@ -21,15 +21,15 @@ function login(body) {
 		return userServices.login(body)
 			.then(
 				logged => {
-					console.log(logged)
-					if (logged.statusCode && logged.statusCode === 200) {
-						userServices.generateLoginToken(logged);
+					console.log(logged.data.token)
+					if (logged.status && logged.status === 200) {
+						userServices.generateLoginToken(logged.data);
 						dispatch(loginSuccess({ loggedIn: true, jwt: logged.data.token }))
-						dispatch(toastSuccess('Connexion réussie'));
+						toastSuccess('Connexion réussie');
 					}
 					else {
 						console.log(logged.message)
-						dispatch(toastError(logged.message));
+						toastError(logged.message);
 					}
 				},
 				error => {

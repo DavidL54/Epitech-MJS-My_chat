@@ -43,12 +43,13 @@ const Login = props => {
 				username: username,
 				password: password,
 			});
-			userServices.login(body).then((res) => {
+			props.login(body);
+				/*.then((res) => {
 				if (res.statusText && res.statusText === "KO") {
 					console.log(res.message);
 					toastError(`Error : ${res.message}`);
 				}
-			})
+			})*/
 		}
 	}
 
