@@ -253,7 +253,7 @@ router.delete('/:userId', checkAuth, (req, res, next) => {
         });
 });
 
-router.put('/forgot-password', (req, res, next) => {
+router.put('/forgotpassword', (req, res, next) => {
     User.find({email: req.body.email})
         .exec()
         .then(user => {
@@ -288,7 +288,7 @@ router.put('/forgot-password', (req, res, next) => {
 
 });
 
-router.get('/resetpassword/:token', (req, res, next) => {
+router.post('/resetpassword/:token', (req, res, next) => {
     const token = req.params.token
     const newPass = req.body.newpass
 
