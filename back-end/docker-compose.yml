@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  backend:
+    container_name: Elian_Back
+    build:
+      context: ./
+      dockerfile: DockerFile
+    volumes:
+      - ./:/usr/app
+    ports:
+      - "8080:8080"
+    links:
+      - mongo
+  mongo:
+    container_name: mongo
+    image: mongo
+    command: mongod --port 27030
+    ports:
+      - '27030:27030'
