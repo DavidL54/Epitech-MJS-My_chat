@@ -1,0 +1,300 @@
+@import "./variables.scss";
+
+#profil {
+	margin-top: 50px;
+  margin-left: auto;
+  margin-right: auto;
+	.roundimage {
+		width: 200px;
+		height: 200px;
+		border-top-left-radius: 50% 50%;
+		border-top-right-radius: 50% 50%;
+		border-bottom-right-radius: 50% 50%;
+		border-bottom-left-radius: 50% 50%;
+		object-fit: cover;
+		display: block;
+		margin: 0 auto 0px;
+		background-color: grey;
+	}
+
+	.recentlyPlayedItem {
+		display: inline-block;
+		width: 190px;
+		background-color: $background-light;
+		padding: 15px;
+		margin: 10px;
+		border-radius: 10px;
+		vertical-align: top;
+
+		&:not(:first-of-type) {
+			margin-left: 10px;
+		}
+
+		.image {
+			height: 150px;
+			width: 150px;
+			display: block;
+			margin: 0 auto 15px;
+		}
+
+		.title {
+			font-size: 16px;
+			color: $white;
+		}
+
+		.artists {
+			font-size: 14px;
+			color: $ligh-grey;
+			margin-bottom: 5px;
+		}
+
+		.container {
+			position: relative;
+			width: 100%;
+			max-width: 400px;
+		}
+
+		.overlay {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			height: 100%;
+			width: 100%;
+			opacity: 0;
+			transition: .3s ease;
+			background-color: black;
+		}
+
+		.container:hover .overlay {
+			opacity: 0.8;
+		}
+
+		.icon {
+			color: white;
+			font-size: 100px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			-ms-transform: translate(-50%, -50%);
+			text-align: center;
+		}
+
+		.fa-user:hover {
+			color: #eee;
+		}
+
+	}
+
+	.recentlyPlayedItemVersion {
+		display: inline-block;
+		width: 250px;
+		background-color: rgba(73, 73, 73, 0.897);
+		padding: 15px;
+		margin-top: 50px;
+		margin-bottom: 40px;
+		margin-right: 130px;
+		margin-left: 10px;
+		border-radius: 10px;
+		vertical-align: top;
+		box-shadow: -10px 10px 5px #282828;
+
+
+		&:not(:first-of-type) {
+			margin-left: 10px;
+		}
+
+		.image {
+			height: 160px;
+			width: 250px;
+			object-fit: cover;
+			display: block;
+			margin: 0 auto 15px;
+		}
+
+
+
+		.title {
+			font-size: 16px;
+			color: $white;
+		}
+
+		.artists {
+			font-size: 14px;
+			color: $ligh-grey;
+			margin-bottom: 5px;
+		}
+
+		.container {
+			position: relative;
+			width: 100%;
+			max-width: 400px;
+			margin-top: -50px;
+			margin-left: 20px;
+		}
+
+
+		.overlay {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			height: 160px;
+			width: 125px;
+			opacity: 0;
+			transition: .3s ease;
+			background-color: black;
+		}
+
+		.overlaytwo {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 125px;
+			right: 0;
+			height: 160px;
+			width: 125px;
+			opacity: 0;
+			transition: .3s ease;
+			background-color: black;
+		}
+
+		.overlaythree {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			height: 160px;
+			width: 250px;
+			opacity: 0;
+			transition: .3s ease;
+			background-color: black;
+		}
+
+		.overlay:hover {
+			opacity: 0.8;
+		}
+
+		.overlaytwo:hover {
+			opacity: 0.8;
+		}
+
+		.overlaythree:hover {
+			opacity: 0.8;
+		}
+
+		.icon {
+			color: white;
+			font-size: 100px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			-ms-transform: translate(-50%, -50%);
+			text-align: center;
+		}
+
+		.fa-user:hover {
+			color: #eee;
+		}
+
+	}
+
+	.recentlyPlayedItemArtist {
+		display: inline-block;
+		width: 230px;
+		height: 350px;
+		background-color: rgb(35, 35, 35);
+		padding: 15px;
+		margin-top: 10px;
+		margin-bottom: 10px;
+		margin-right: 10px;
+		margin-left: 10px;
+		border-radius: 10px;
+		vertical-align: top;
+
+		&:not(:first-of-type) {
+			margin-left: 10px;
+		}
+
+		.roundimage {
+			width: 200px;
+			height: 200px;
+			border-top-left-radius: 50% 50%;
+			border-top-right-radius: 50% 50%;
+			border-bottom-right-radius: 50% 50%;
+			border-bottom-left-radius: 50% 50%;
+			object-fit: cover;
+			display: block;
+			margin: 0 auto 15px;
+			background-color: grey;
+		}
+
+
+		.title {
+			font-size: 18px;
+			color: $white;
+			margin-top: 50px;
+			text-align: center;
+		}
+
+		.artists {
+			font-size: 14px;
+			color: $ligh-grey;
+			margin-top: 15px;
+			margin-bottom: 5px;
+		}
+
+		.containerartist {
+			position: relative;
+			width: 100%;
+			max-width: 250px;
+		}
+
+		.icon {
+			color: white;
+			font-size: 100px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			-ms-transform: translate(-50%, -50%);
+			text-align: center;
+		}
+
+		.fa-user:hover {
+			color: #eee;
+		}
+
+	}
+
+	.recentlyPlayedItemArtist:hover {
+		opacity: 0.5;
+		color: white;
+		background-color: rgb(100, 100, 100);
+		cursor: pointer;
+	}
+
+	.divbutton {
+		margin-top: 15px;
+		position: relative;
+		text-align: center;
+	}
+
+	.box {
+		margin-top: 15px;
+		position: relative;
+		text-align: center;
+	}
+
+	.boxtrack {
+		max-width: 800px;
+		margin-top: 15px;
+		  margin-left: auto;
+		  margin-right: auto;
+	}
+}
