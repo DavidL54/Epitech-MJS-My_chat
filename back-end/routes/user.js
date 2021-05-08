@@ -27,13 +27,13 @@ function createUserSchema(body, hash) {
         password: hash,
         username: body.username,
         name: body.name,
-        firstname: body.name,
+        firstname: body.firstname,
         age: body.age
     });
 }
 
 router.post('/signup', (req, res, next) => {
-    User.find({ email: req.body.email })
+    User.find({email: req.body.email})
         .exec()
         .then(user => {
             if (user.length >= 1) {
@@ -41,7 +41,7 @@ router.post('/signup', (req, res, next) => {
                     'Mail exists'
                 )
             } else {
-                User.find({ username: req.body.username })
+                User.find({username: req.body.username})
                     .exec()
                     .then(username => {
                         if (username.length >= 1) {
@@ -81,7 +81,7 @@ router.post('/signup', (req, res, next) => {
                                                     };
                                                     transporter.sendMail(mailOptions, function (err) {
                                                         // if (err)
-                                                            //return res.status(500).send({ msg: 'Technical Issue!, Please click on resend for verify your Email.' });
+                                                        //return res.status(500).send({ msg: 'Technical Issue!, Please click on resend for verify your Email.' });
                                                         return 'A verification email has been sent to ' + user.email + '. It will be expire after one day. If you not get verification Email click on resend token.';
                                                     });
                                                 })
@@ -113,16 +113,16 @@ router.post('/signup', (req, res, next) => {
 });
 
 router.get('/confirmation/:email/:token', (req, res, next) => {
-    Token.findOne({ token: req.params.token }, function (err, token) {
+    Token.findOne({token: req.params.token}, function (err, token) {
         // token is not found into database i.e. token may have expired
         if (!token) {
-            return res.status(400).send({ msg: 'Your verification link may have expired. Please click on resend for verify your Email.' });
+            return res.status(400).send({msg: 'Your verification link may have expired. Please click on resend for verify your Email.'});
         } else {
             // if token is found then check valid user
-            User.findOne({ _id: token._userId, email: req.params.email }, function (err, user) {
+            User.findOne({_id: token._userId, email: req.params.email}, function (err, user) {
                 // not valid user
                 if (!user) {
-                    return res.status(401).send({ msg: 'We were unable to find a user for this verification. Please SignUp!' });
+                    return res.status(401).send({msg: 'We were unable to find a user for this verification. Please SignUp!'});
                 }
                 // user is already verified
                 else if (user.active) {
@@ -135,7 +135,7 @@ router.get('/confirmation/:email/:token', (req, res, next) => {
                     user.save(function (err) {
                         // error occur
                         if (err) {
-                            return res.status(500).send({ msg: err.message });
+                            return res.status(500).send({msg: err.message});
                         }
                         // account successfully verified
                         else {
@@ -150,7 +150,7 @@ router.get('/confirmation/:email/:token', (req, res, next) => {
 });
 
 router.post('/login', (req, res, next) => {
-    User.find({ "$or": [{ email: req.body.username }, { username: req.body.username }] })
+    User.find({"$or": [{email: req.body.username}, {username: req.body.username}]})
         .exec()
         .then(user => {
             // if (user.length < 1) {
@@ -171,9 +171,9 @@ router.post('/login', (req, res, next) => {
                 }
                 if (result) {
                     const token = jwt.sign({
-                        email: user[0].email,
-                        userId: user[0]._id
-                    },
+                            email: user[0].email,
+                            userId: user[0]._id
+                        },
                         process.env.JWT_KEY,
                         {
                             expiresIn: "3h"
@@ -196,48 +196,50 @@ router.post('/login', (req, res, next) => {
 });
 
 router.get('/newlink', (req, res, next) => {
-    User.find({ "$or": [{ email: req.body.username }, { username: req.body.username }] })
+    User.find({"$or": [{email: req.body.username}, {username: req.body.username}]})
         .exec()
         .then(user => {
-        // user is not found into database
-        console.log(user)
-        if (!user) {
-            return res.status(400).send({msg:'We were unable to find a user with that email. Make sure your Email is correct!'});
-        }
-        // user has been already verified
-        else if (user[0].active) {
-            return res.status(200).send('This account has been already verified. Please log in.');
-        }
-        // send verification link
-        else {
-            // generate token and save
-            const token = new Token({ _userId: user[0]._id, token: crypto.randomBytes(16).toString('hex') });
-            token.save(function (err) {
-                if (err) {
-                    return res.status(500).send({msg:err.message});
-                }
-                // Send email (use credintials of SendGrid)
-                const transporter = nodemailer.createTransport({ service: 'Gmail', auth: { user: process.env.GMAIL_USERNAME, pass: process.env.GMAIL_PASSWORD } });
-                const mailOptions = {
-                    from: 'd.e.scord5499@gmail.com',
-                    to: user[0].email,
-                    subject: 'Account Verification Link',
-                    text: 'Hello ' + req.body.name + ',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/user\/confirmation\/' + user[0].email + '\/' + token.token + '\n\nThank You!\n'
-                };
-                transporter.sendMail(mailOptions, function (err) {
-                    if (err)
-                        return res.status(500).send('Technical Issue!, Please click on resend for verify your Email.');
-                    return res.status(200).send('A verification email has been sent to ' + user[0].email + '. It will be expire after one day. If you not get verification Email click on resend token.');
+            // user is not found into database
+            console.log(user)
+            if (!user) {
+                return res.status(400).send({msg: 'We were unable to find a user with that email. Make sure your Email is correct!'});
+            }
+            // user has been already verified
+            else if (user[0].active) {
+                return res.status(200).send('This account has been already verified. Please log in.');
+            }
+            // send verification link
+            else {
+                // generate token and save
+                const token = new Token({_userId: user[0]._id, token: crypto.randomBytes(16).toString('hex')});
+                token.save(function (err) {
+                    if (err) {
+                        return res.status(500).send({msg: err.message});
+                    }
+                    // Send email (use credintials of SendGrid)
+                    const transporter = nodemailer.createTransport({
+                        service: 'Gmail',
+                        auth: {user: process.env.GMAIL_USERNAME, pass: process.env.GMAIL_PASSWORD}
+                    });
+                    const mailOptions = {
+                        from: 'd.e.scord5499@gmail.com',
+                        to: user[0].email,
+                        subject: 'Account Verification Link',
+                        text: 'Hello ' + req.body.name + ',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/user\/confirmation\/' + user[0].email + '\/' + token.token + '\n\nThank You!\n'
+                    };
+                    transporter.sendMail(mailOptions, function (err) {
+                        if (err)
+                            return res.status(500).send('Technical Issue!, Please click on resend for verify your Email.');
+                        return res.status(200).send('A verification email has been sent to ' + user[0].email + '. It will be expire after one day. If you not get verification Email click on resend token.');
+                    });
                 });
-            });
-        }
-    });
+            }
+        });
 })
 
 
-
 router.delete('/:userId', checkAuth, (req, res, next) => {
-    User.remove({ id: req.params.userId })
+    User.remove({id: req.params.userId})
         .exec()
         .then(result => {
             res.status(200).json({
@@ -250,5 +252,66 @@ router.delete('/:userId', checkAuth, (req, res, next) => {
             });
         });
 });
+
+router.put('/forgot-password', (req, res, next) => {
+    User.find({email: req.body.email})
+        .exec()
+        .then(user => {
+            if (!user) {
+                return res.status(400).json("user with the email does not exists.")
+            }
+
+            const token = jwt.sign({_id: user[0]._id}, process.env.JWT_KEY_RESET, {expiresIn: "20m"})
+            const transporter = nodemailer.createTransport({
+                service: 'Gmail',
+                auth: {user: process.env.GMAIL_USERNAME, pass: process.env.GMAIL_PASSWORD}
+            });
+            const mailOptions = {
+                from: 'd.e.scord5499@gmail.com',
+                to: user[0].email,
+                subject: 'Reset Password Link',
+                text: 'Hello ' + req.body.name + ',\n\n' + 'Please click on given link to reset your password: \nhttp:\/\/' + req.headers.host + '\/user\/resetpassword\/' + token + '\n\nThank You!\n'
+            };
+            user[0].updateOne({resetLink: token}, (err, succes) => {
+                if (err) {
+                    return res.status(400).json('reset password link error')
+                } else {
+                    transporter.sendMail(mailOptions, function (err) {
+                        if (err)
+                            return res.status(500).send('Technical Issue!, Please click on resend for verify your Email.');
+                        return res.status(200).send('A reset password has been sent to ' + user[0].email + '. It will be expire after 20 minutes. If you not get reset Email click on resend token.');
+                    });
+
+                }
+            });
+        });
+
+});
+
+router.get('/resetpassword/:token', (req, res, next) => {
+    const token = req.params.token
+    const newPass = req.body.newpass
+
+    if (token) {
+        jwt.verify(token, process.env.JWT_KEY_RESET, (err, decodeData) => {
+            if (err)
+                return res.status(200).json("error for veirfy token")
+            User.findOne({resetLink: token}, (err, user) => {
+                if (err || !user)
+                    return res.status(400).json("User with this token does not exist.")
+                bcrypt.hash(newPass, 10, (err, hash) => {
+                    user.updateOne({password: hash}, (err, result) => {
+                        if (err)
+                            return res.status(400).json("reset password link error")
+                        else {
+                            return res.status(200).json({message: "Your password has been changed"})
+                        }
+                    })
+                });
+            });
+        });
+    }
+});
+
 
 module.exports = router;
