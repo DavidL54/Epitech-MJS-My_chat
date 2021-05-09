@@ -25,12 +25,12 @@ exports.createRoom = (req, res) => {
                 );
             } else {
                 const room = new Room({
-                    roomadmin: req.userData.userId,
+                    roomAdmin: req.userData.userId,
                     name: req.body.name
                 });
                 room.save()
                     .then(result => {
-                        return res.status(200).json({ message: "Room created with success" })
+                        return res.status(200).json(room)
                     });
             }
         });
@@ -55,7 +55,7 @@ exports.deleteRoom = (req, res) => {
 }
 
 exports.getRoomByUser = (req, res) => {
-    Room.find({ roomadmin: req.params.id }).select('name').exec()
+    Room.find({ roomAdmin: req.params.id }).select('name').exec()
         .then((rooms, err) => {
             if (err) {
                 res.status(400).json(err);

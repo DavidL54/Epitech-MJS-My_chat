@@ -49,6 +49,7 @@ const Contact = (props) => {
 		console.log(props.user)
 		roomServices.getRoomByUser(props.user.userId)
 			.then(res => {
+				console.log(res);
 				setmyRoom(res);
 				toastSuccess
 		})
