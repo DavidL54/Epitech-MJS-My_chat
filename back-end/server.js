@@ -2,6 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const app = express();
+const server = require('http').Server(app)
+const io = require('socket.io')(server)
+
 const port = process.env.PORT || 8080;
 
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -29,9 +32,14 @@ app.get('/', (req, res) => {
     res.json({ "message": "Welcome to DEscord" });
 });
 
+
+// app.set("io", io)
+require('./middleware/mySocket.js')(io);
 require('./routes/routeUser.js')(app);
 require('./routes/routeRoom.js')(app);
 
-app.listen(port, () => {
+
+server.listen(port, () => {
     console.log("Server is listening on port ", port);
 });
+

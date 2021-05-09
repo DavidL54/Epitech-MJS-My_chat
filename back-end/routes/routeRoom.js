@@ -9,5 +9,4 @@ module.exports = (app) => {
     app.route('/room/:id')
         .put(checkAuth, controllerRoom.updateRoom)
         .delete(checkAuth, controllerRoom.deleteRoom);
-
 }
