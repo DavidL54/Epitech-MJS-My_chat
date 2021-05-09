@@ -9,9 +9,18 @@ const User = require('../models/modelUser');
 const Token = require('../models/modelToken')
 require("dotenv").config();
 
-
-exports.def = (req, res) => {
-    res.status(409).json({ message: 'test' });
+exports.getAll = (req, res) => {
+    User.find({}, (error, user) => {
+        if (error) {
+            res.status(404).json(error);
+        }
+        else if (user === null) {
+            res.status(400).send({ error: 'Server was unable to find users' });
+        }
+        else {
+            res.status(200).json(user);
+        }
+    });
 };
 
 exports.signup = (req, res) => {
@@ -152,6 +161,8 @@ exports.login = (req, res) => {
                 }
                 if (result) {
                     const token = jwt.sign({
+                            name: user[0].name,
+                            firstname: user[0].firstname,
                             email: user[0].email,
                             userId: user[0]._id
                         },

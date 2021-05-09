@@ -4,7 +4,7 @@ const checkAuth = require('../middleware/check-auth');
 
 module.exports = (app) => {
     app.route('/user')
-        .get(checkAuth, controllerUser.def);
+        .get(checkAuth, controllerUser.getAll);
     app.route('/user/signup')
         .post(controllerUser.signup);
     app.route('/user/login')

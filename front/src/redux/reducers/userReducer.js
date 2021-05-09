@@ -1,10 +1,13 @@
 import { userConstants } from '../constants/userConstants';
+import Cookies from 'js-cookie'
+import jwt_decode from "jwt-decode";
 
-let localUser = JSON.parse(localStorage.getItem('user'));
+let localUser = Cookies.get('jwt');
 
 let initialState = {};
 if (localUser) {
-	initialState = { user: localUser };
+	var decoded = jwt_decode(localUser);
+	initialState = decoded
 } else {
 	initialState = {};
 }

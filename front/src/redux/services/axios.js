@@ -4,6 +4,7 @@ import config from '../../config';
 import { userServices } from './userServices';
 import { auth } from '../../helpers/authHeader';
 import { toastr } from 'react-redux-toastr';
+import { toastError } from '../actions/alertActions';
 
 const main = axios.create();
 
@@ -35,10 +36,9 @@ main.interceptors.response.use(undefined, (err) => {
 export const apiClient = main;
 
 export function handleResponse(response) {
-  console.log(response.status);
   if (response.status) {
-    if (response.status === 403) {
-      toastr.error('Erreur', "Votre session a expiré, veuillez vous reconnecter")
+    if (response.status === 401) {
+      toastError('You have been disconnect, please reconnect')
       userServices.logout();
     }
     else if (response.status >= 200 && response.status <= 299) {

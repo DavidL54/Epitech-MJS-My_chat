@@ -22,7 +22,6 @@ function login(body, setredirectRecover) {
 		return userServices.login(body)
 			.then(
 				logged => {
-					console.log(logged);
 					if (logged.message && logged.message === "OK") {
 						userServices.generateLoginToken(logged);
 						dispatch(loginSuccess({ loggedIn: true, jwt: logged.token }))

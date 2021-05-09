@@ -20,6 +20,7 @@ import HomeIcon from '@material-ui/icons/Home';
 import SearchIcon from '@material-ui/icons/Search';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import ContactPhoneIcon from '@material-ui/icons/ContactPhone';
 import PersonIcon from '@material-ui/icons/Person';
 import AlbumIcon from '@material-ui/icons/Album';
 import { sidebarActions } from '../../redux/actions/sidebarActions'
@@ -242,7 +243,11 @@ const Layout = (props) => {
 						<ListItemIcon className={classes.itemToolBar} ><HomeIcon/></ListItemIcon>
 						<ListItemText primary={"Accueil"}/>
 					</ListItem>
-					<ListItem button key={"calendar"} component={NavLink} to="/admin">
+					<ListItem button key={"contact"} component={NavLink} to="/contact">
+						<ListItemIcon className={classes.itemToolBar}><ContactPhoneIcon /></ListItemIcon>
+						<ListItemText primary={"Contact"} />
+					</ListItem>
+					<ListItem button key={"account"} component={NavLink} to="/admin">
 						<ListItemIcon className={classes.itemToolBar}><PersonIcon /></ListItemIcon>
 						<ListItemText primary={"Compte"} />
 					</ListItem>

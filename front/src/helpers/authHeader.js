@@ -13,7 +13,6 @@ function authHeader() {
     if (state.authentication.auth && state.authentication.auth.jwt) {
         auth = state.authentication.auth.jwt;        
     }
-   // console.log(auth);
     if (auth) {        
         return `Bearer ${auth}`;
     } else {

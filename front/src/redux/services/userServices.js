@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie'
 import { apiClient, handleResponse } from "./axios";
+import jwt_decode from 'jwt-decode';
 
 export const userServices = {
     login,
@@ -7,13 +8,17 @@ export const userServices = {
     createUser,
     generateLoginToken,
     recover,
-    resetpasswordCallback
+    resetpasswordCallback,
+    getAll
 };
 
 function generateLoginToken(auth) {
     if (auth !== undefined) {
-        if (auth.token)
+        if (auth.token) {
             Cookies.set('jwt', auth.token, { secure: true }, { sameSite: 'strict' })
+            var decoded = jwt_decode(auth.token);
+            localStorage.setItem('user',decoded)
+        }
     }
 }
 
@@ -41,6 +46,13 @@ function resetpasswordCallback(token, body) {
         })
 }
 
+function getAll() {
+    return apiClient.get(`/user`)
+        .then(handleResponse)
+        .then(data => {
+            return data
+        })
+}
 
 
 function createUser(body) {
