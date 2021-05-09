@@ -1,6 +1,7 @@
 import { userConstants } from "../constants/userConstants";
 import { userServices } from '../services/userServices';
 import { toastError, toastSuccess } from './alertActions';
+import { change } from 'redux-form';
 
 export const userActions = {
 	login,
@@ -15,26 +16,31 @@ function logout() {
 	}
 }
 
-function login(body) {
+function login(body, setredirectRecover) {
 	return dispatch => {
 		dispatch(loginRequest({ body }));
 		return userServices.login(body)
 			.then(
 				logged => {
-					console.log(logged.data.token)
-					if (logged.status && logged.status === 200) {
-						userServices.generateLoginToken(logged.data);
-						dispatch(loginSuccess({ loggedIn: true, jwt: logged.data.token }))
+					console.log(logged);
+					if (logged.message && logged.message === "OK") {
+						userServices.generateLoginToken(logged);
+						dispatch(loginSuccess({ loggedIn: true, jwt: logged.token }))
 						toastSuccess('Connexion réussie');
 					}
+					else if (logged.status == 401) {
+						const parsedBody = JSON.parse(body);
+						dispatch(change(`recover`, 'email', parsedBody.username));
+						const action = { name: "Recover my password", action: { fonction: setredirectRecover, param: true }};
+						toastError(logged.message, action );
+					}
 					else {
-						console.log(logged.message)
 						toastError(logged.message);
 					}
 				},
 				error => {
 					dispatch(loginFailure(error.toString()));
-					dispatch(toastError(error));
+					toastError(error);
 				}
 			)
 			.catch((error) => {

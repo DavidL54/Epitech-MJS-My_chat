@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../../scss/Login.scss';
 import config from "../../config";
 import queryString from 'query-string';
-import { Field, reduxForm } from 'redux-form';
+import { Field, reduxForm, change } from 'redux-form';
 import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import {
@@ -31,16 +31,25 @@ const fieldStyle = { width: "30ch", backgroundColor: "white", padding: "15px", m
 
 const Login = props => {
 	const classes = useStyles();
-	const [email, setemail] = useState("t@t.fr");
+	const [email, setemail] = useState("");
 	const [age, setage] = useState(20);
 	const [password, setPassword] = useState("e");
 	const [username, setusername] = useState("e");
 	const [firstname, setfirstname] = useState("e");
 	const [name, setname] = useState("e");
-	const [showpassword, setshowpassword] = useState(false);
+	const [redirectRecover, setredirectRecover] = useState(false);
 	const [redirectlogin, setredirectlogin] = useState(false);
+
+
 	useEffect(() => {
-	}, [props]);
+		const form = props.form;
+		if (form && form.values && form.values.email) {
+			if (form.values.email.includes("@"))
+				setemail(form.values.email);
+			else
+				setusername(form.values.email);
+		}
+	}, [])
 
 	const connectme = () => {
 		if (password && username) {
@@ -54,7 +63,12 @@ const Login = props => {
 			});
 			userServices.createUser(body)
 				.then((res) => {
-					if (res.statusText && res.statusText === "KO") {
+					if (res.status && res.status == 409) {
+						props.dispatch(change(`recover`, 'email', email));
+						const action = { name: "Recover my password", action: { fonction: setredirectRecover, param: true } };
+						toastError(`Error : ${res.message}`, action);
+					}
+					else if (res.statusText && res.statusText === "KO") {
 						toastError(`Error : ${res.message}`);
 					}
 					else {
@@ -68,6 +82,9 @@ const Login = props => {
 
 	if (redirectlogin) {
 		return <Redirect push to="/login" />;
+	}
+	else if (redirectRecover) {
+		return <Redirect push to="/user/resetpassword" />;
 	}
 	return (
 		<div id="login" className="App">
@@ -153,7 +170,8 @@ const Login = props => {
 }
 
 function mapState(state) {
-	return ({})
+
+	return ({ form: state.form.recover })
 }
 
 const actionCreators = {
@@ -164,5 +182,5 @@ const actionCreators = {
 const connectedLogin = connect(mapState, actionCreators)(Login);
 
 export default reduxForm({
-	form: 'log_in_form',
+	form: 'recover',
 })(connectedLogin);

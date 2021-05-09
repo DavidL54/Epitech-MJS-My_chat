@@ -7,6 +7,7 @@ import locationHelperBuilder from "redux-auth-wrapper/history4/locationHelper";
 import Layout from './Layout';
 import Loader from "react-loader-spinner";
 import SignUp from '../SignUp/index';
+import Recover from '../Recover/index';
 
 const locationHelper = locationHelperBuilder({});
 
@@ -61,6 +62,7 @@ const Router = () => (
     <Switch>
         <Route exact path="/" component={userIsNotAuthenticated(LogIn)} />
         <Route exact path="/signup" component={userIsNotAuthenticated(SignUp)} />
+        <Route path="/user/resetpassword/:token?" component={userIsNotAuthenticated(Recover)} />
         <Route path="/" component={userIsAuthenticated(wrappedRoutes)} />
     </Switch>
 );

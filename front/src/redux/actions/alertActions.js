@@ -39,14 +39,16 @@ export const toastSuccess = (message) => {
   }));
 };
 
-export const toastError = (message) => {
-  store.dispatch(enqueueSnackbar({
+export const toastError = (message, action) => {
+  let toast = {
     message,
     options: {
       key: new Date().getTime() + Math.random(),
       variant: 'error',
     },
-  }));
+  }
+  if (action) toast.redirectAction = action;
+  store.dispatch(enqueueSnackbar(toast));
 };
 
 export const toastWarning = (message) => {

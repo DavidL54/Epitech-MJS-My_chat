@@ -35,12 +35,20 @@ main.interceptors.response.use(undefined, (err) => {
 export const apiClient = main;
 
 export function handleResponse(response) {
-  if (response.data && response.data.statusCode && response.data.statusCode === 403) {
-    toastr.error('Erreur', "Votre session a expiré, veuillez vous reconnecter")
-    userServices.logout();
+  console.log(response.status);
+  if (response.status) {
+    if (response.status === 403) {
+      toastr.error('Erreur', "Votre session a expiré, veuillez vous reconnecter")
+      userServices.logout();
+    }
+    else if (response.status >= 200 && response.status <= 299) {
+      return response.data;
+    }
+    else {
+      return response;
+    }
   }
-  else 
-    return response;
+  else return response;
 }
 
 

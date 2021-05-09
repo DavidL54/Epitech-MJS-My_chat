@@ -5,7 +5,9 @@ export const userServices = {
     login,
     logout,
     createUser,
-    generateLoginToken
+    generateLoginToken,
+    recover,
+    resetpasswordCallback
 };
 
 function generateLoginToken(auth) {
@@ -22,6 +24,23 @@ function login(body) {
             return data
         })
 }
+
+function recover(body) {
+    return apiClient.put(`/user/forgotpassword`, body)
+        .then(handleResponse)
+        .then(data => {
+            return data
+        })
+}
+
+function resetpasswordCallback(token, body) {
+    return apiClient.post(`/user/resetpassword/${token}`, body)
+        .then(handleResponse)
+        .then(data => {
+            return data
+        })
+}
+
 
 
 function createUser(body) {

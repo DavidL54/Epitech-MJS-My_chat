@@ -1,11 +1,12 @@
 /* eslint-disable object-shorthand */
 /* eslint-disable key-spacing */
-import React, { useEffect } from 'react';
+import React, { useEffect, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSnackbar } from 'notistack';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { removeSnackbar } from '../../redux/actions/alertActions';
+import { useHistory } from "react-router-dom";
 
 let displayed = [];
 
@@ -34,12 +35,33 @@ const Notifier = () => {
 
   useEffect(() => {
     notifications.forEach(({
-      key, message, options = {}, dismissed = false,
+      key, message, options = {}, dismissed = false, redirectAction
     }) => {
       if (dismissed) {
         closeSnackbar(key);
         return;
       }
+      const allActions = [];
+      allActions.push(<Button
+        className={classes.button}
+        size="meddium"
+        onClick={() => {
+          closeSnackbar(key);
+        }}
+      >
+        Close
+          </Button>)
+      
+      if (redirectAction) {
+        allActions.push(<Button
+          className={classes.button}
+          size="meddium"
+          onClick={() => { redirectAction.action.fonction(redirectAction.action.param); closeSnackbar(key);}}
+        >
+          {redirectAction.name}
+          </Button>)
+      }
+
       if (displayed.includes(key)) return;
       enqueueSnackbar(message, {
         key,
@@ -59,15 +81,9 @@ const Notifier = () => {
           removeDisplayed(myKey);
         },
         action: (
-          <Button
-            className={classes.button}
-            size="meddium"
-            onClick={() => {
-              closeSnackbar(key);
-            }}
-          >
-            Close
-          </Button>
+          <React.Fragment>
+            {allActions}
+          </React.Fragment>
         ),
       });
       storeDisplayed(key);

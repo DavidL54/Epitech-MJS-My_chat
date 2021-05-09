@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../../scss/Login.scss';
 import config from "../../config";
 import queryString from 'query-string';
-import { Field, reduxForm } from 'redux-form';
+import { Field, reduxForm, change } from 'redux-form';
 import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import {
@@ -33,6 +33,7 @@ const Login = props => {
 	const [username, setUsername] = useState();
 	const [showpassword, setshowpassword] = useState(false);
 	const [redirectSignup, setredirectSignup] = useState(false);
+	const [redirectRecover, setredirectRecover] = useState(false);
 
 	useEffect(() => {
 	}, [props, redirect]);
@@ -43,7 +44,9 @@ const Login = props => {
 				username: username,
 				password: password,
 			});
-			props.login(body);
+			//props.dispatch(change(`recover`, 'email', 'toto'));
+			props.login(body, setredirectRecover);
+			
 				/*.then((res) => {
 				if (res.statusText && res.statusText === "KO") {
 					console.log(res.message);
@@ -53,11 +56,19 @@ const Login = props => {
 		}
 	}
 
+	const changeusername = (e) => {
+		props.dispatch(change(`recover`, 'email', e.target.value));
+		setUsername(e.target.value)
+	}
+
 	if (redirect) {
 		return <Redirect push to="/" />;
 	}
 	else if (redirectSignup) {
 		return <Redirect push to="/signup" />;
+	}
+	else if (redirectRecover) {
+		return <Redirect push to="/user/resetpassword" />;
 	}
 	else {
 		return (
@@ -72,7 +83,7 @@ const Login = props => {
 						>
 							<TextValidator
 								name="email"
-								onChange={(e, val) => setUsername(e.target.value)}
+							onChange={(e, val) => changeusername(e)}
 								style={fieldStyle}
 								placeholder="Email"
 								type="text"
@@ -119,5 +130,5 @@ const actionCreators = {
 const connectedLogin = connect(mapState, actionCreators)(Login);
 
 export default reduxForm({
-	form: 'log_in_form',
+	form: 'recover',
 })(connectedLogin);

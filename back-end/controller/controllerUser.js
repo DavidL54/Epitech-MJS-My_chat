@@ -5,34 +5,16 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
-const router = express.Router();
-
-const User = require('../models/user');
-const Token = require('../models/token')
-const checkAuth = require('../middleware/check-auth');
-
+const User = require('../models/modelUser');
+const Token = require('../models/modelToken')
 require("dotenv").config();
 
 
-router.get('/', checkAuth, (req, res, next) => {
-    res.status(409).json({
-        message: 'test'
-    });
-});
+exports.def = (req, res) => {
+    res.status(409).json({ message: 'test' });
+};
 
-function createUserSchema(body, hash) {
-    return new User({
-        _id: new mongoose.Types.ObjectId(),
-        email: body.email,
-        password: hash,
-        username: body.username,
-        name: body.name,
-        firstname: body.firstname,
-        age: body.age
-    });
-}
-
-router.post('/signup', (req, res, next) => {
+exports.signup = (req, res) => {
     User.find({email: req.body.email})
         .exec()
         .then(user => {
@@ -51,9 +33,15 @@ router.post('/signup', (req, res, next) => {
                         } else {
                             bcrypt.hash(req.body.password, 10, (err, hash) => {
                                 if (!err) {
-                                    const user = createUserSchema(req.body, hash)
-                                    user
-                                        .save()
+                                    const user = new User({
+                                        email: req.body.email,
+                                        password: hash,
+                                        username: req.body.username,
+                                        name: req.body.name,
+                                        firstname: req.body.firstname,
+                                        age: req.body.age
+                                    });
+                                    user.save()
                                         .then(result => {
                                             // generate token and save
                                             const token = new Token({
@@ -110,9 +98,9 @@ router.post('/signup', (req, res, next) => {
                     })
             }
         });
-});
+};
 
-router.get('/confirmation/:email/:token', (req, res, next) => {
+exports.confirmEmailToken = (req, res) => {
     Token.findOne({token: req.params.token}, function (err, token) {
         // token is not found into database i.e. token may have expired
         if (!token) {
@@ -147,55 +135,40 @@ router.get('/confirmation/:email/:token', (req, res, next) => {
         }
 
     });
-});
+};
 
-router.post('/login', (req, res, next) => {
-    User.find({"$or": [{email: req.body.username}, {username: req.body.username}]})
-        .exec()
-        .then(user => {
-            // if (user.length < 1) {
-            //     return res.status(401).json(
-            //         'Email doesn\'t exist');
-            // }
+exports.login = (req, res) => {
+    console.log("ca passe");
+    User.find({"$or": [{email: req.body.username}, {username: req.body.username}]}).exec()
+        .then((user, err) => {
+            console.log(user);
+            if (user.length < 1) {
+                 return res.status(404).json('User doesn\'t exist');
+            }
             bcrypt.compare(req.body.password, user[0].password, (err, result) => {
-                if (err) {
-                    return res.status(401).json(
-                        'Auth failed'
-                    );
-                }
-                console.log(user)
+                if (err) return res.status(401).json('Auth failed');
                 if (!user[0].active) {
-                    return res.status(401).json(
-                        'Your Email has not been verified. Please click on resend'
-                    )
+                    return res.status(401).json('Your Email has not been verified. Please click on resend')
                 }
                 if (result) {
                     const token = jwt.sign({
                             email: user[0].email,
                             userId: user[0]._id
                         },
-                        process.env.JWT_KEY,
-                        {
+                        process.env.JWT_KEY,{
                             expiresIn: "3h"
                         }
                     );
                     return res.status(200).json({
-                        message: 'Auth successful',
+                        message: 'OK',
                         token: token
                     })
                 }
-                res.status(401).json(
-                    'Wrong Password')
-            });
+                res.status(401).json('Wrong Password')});
         })
-        .catch(err => {
-            res.status(500).json({
-                error: err
-            });
-        })
-});
+};
 
-router.get('/newlink', (req, res, next) => {
+exports.generateLink = (req, res) => {
     User.find({"$or": [{email: req.body.username}, {username: req.body.username}]})
         .exec()
         .then(user => {
@@ -235,10 +208,9 @@ router.get('/newlink', (req, res, next) => {
                 });
             }
         });
-})
+}
 
-
-router.delete('/:userId', checkAuth, (req, res, next) => {
+exports.deleteUser = (req, res) => {
     User.remove({id: req.params.userId})
         .exec()
         .then(result => {
@@ -251,9 +223,9 @@ router.delete('/:userId', checkAuth, (req, res, next) => {
                 error: err
             });
         });
-});
+};
 
-router.put('/forgotpassword', (req, res, next) => {
+exports.forgotpass = (req, res) => {
     User.find({"$or": [{email: req.body.username}, {username: req.body.username}]})
         .exec()
         .then(user => {
@@ -286,9 +258,9 @@ router.put('/forgotpassword', (req, res, next) => {
             });
         });
 
-});
+};
 
-router.post('/resetpassword/:token', (req, res, next) => {
+exports.resetPass = (req, res) => {
     const token = req.params.token
     const newPass = req.body.newpass
 
@@ -311,7 +283,4 @@ router.post('/resetpassword/:token', (req, res, next) => {
             });
         });
     }
-});
-
-
-module.exports = router;
+};
