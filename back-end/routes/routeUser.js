@@ -10,7 +10,7 @@ module.exports = (app) => {
     app.route('/user/login')
         .post(controllerUser.login);
     app.route('/user/confirmation/:email/:token')
-        .post(controllerUser.confirmEmailToken);
+        .get(controllerUser.confirmEmailToken);
     app.route('/user/newlink')
         .get(controllerUser.generateLink);
     app.route('/user/:userId')
