@@ -22,10 +22,9 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import ContactPhoneIcon from '@material-ui/icons/ContactPhone';
 import PersonIcon from '@material-ui/icons/Person';
-import AlbumIcon from '@material-ui/icons/Album';
 import { sidebarActions } from '../../redux/actions/sidebarActions'
 import { NavLink } from 'react-router-dom'
-import { auth } from '../../helpers/authHeader';
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -175,7 +174,6 @@ const Layout = (props) => {
 		if (props.sidebar.visibility) {
 			setOpen(props.sidebar.visibility);
 		}
-
 	}, []);
 
 	const handleDrawerOpen = () => {
@@ -259,7 +257,7 @@ const Layout = (props) => {
 			</Drawer>
 			<main className={classes.content}>
 				{props.children}
-			</main>
+				</main>
 		</div>
 	);
 }

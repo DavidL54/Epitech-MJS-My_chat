@@ -14,8 +14,13 @@ services:
       - '8082:8082'
     links:
       - mongo
+      - rabbitmq
     depends_on:
       - mongo
+      - rabbitmq
+    networks:
+      - mychatnetwork
+
 
   mongo:
     image: mongo
@@ -25,6 +30,9 @@ services:
       - /data/db
     command:
       - mongod
+    networks:
+      - mychatnetwork
+
   mongo-admin:
     image: mongo-express
     ports:
@@ -33,3 +41,24 @@ services:
       - mongo
     depends_on:
       - mongo
+    networks:
+      - mychatnetwork
+  
+  
+  
+  rabbitmq:
+    image: rabbitmq:3.8.11-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - mychatnetwork
+
+
+
+networks:
+  mychatnetwork:
+    driver: bridge

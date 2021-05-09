@@ -1,11 +1,11 @@
 const nodemailer = require('nodemailer');
-require("dotenv").config();
+const config = require("../config")
 
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        user: process.env.GMAIL_USERNAME,
-        pass: process.env.GMAIL_PASSWORD
+        user: config.GMAIL_USERNAME,
+        pass: config.GMAIL_PASSWORD
     }
 });
 
@@ -16,10 +16,12 @@ module.exports = (to, subject, message) => {
         subject: subject,
         text: message,
     };
+    console.log(to, subject, message);
     const test = transporter.sendMail(mailOptions, function (err) {
+        console.log(err)
         if (err)
             return false;
         return true;
     });
-    console.log(test)
+    console.log("envoi mail", test)
 };

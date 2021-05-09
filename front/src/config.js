@@ -1,3 +1,4 @@
 export default {
-	API_URL: "http://127.0.0.1:8082/"
+	API_URL: "http://127.0.0.1:8082/",
+	SOCKET_URL: "http://127.0.0.1:8082"
 }

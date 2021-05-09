@@ -22,9 +22,10 @@ function authHeader() {
 
 function getAccessToken() {
     const state = store.getState();
+    console.log(state);
     let auth;
-    if (state.authentication.auth && state.authentication.auth.access_token) {
-        auth = state.authentication.auth.access_token;
+    if (state.authentication.auth && state.authentication.auth.jwt) {
+        auth = state.authentication.auth.jwt;
     }
     if (auth) {
         return auth;

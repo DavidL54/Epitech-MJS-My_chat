@@ -1,5 +1,9 @@
 const Room = require('../models/modelRoom');
 const User = require('../models/modelUser');
+const Invitation = require('../models/modelInvitation');
+const sendMail = require('../middleware/sendMail');
+const config = require('../config');
+const jwt = require('jsonwebtoken');
 
 exports.getAll = (req, res) => {
     Room.find({}).lean().exec()
@@ -14,26 +18,39 @@ exports.getAll = (req, res) => {
 
 };
 
-exports.createRoom = (req, res) => {
-    Room.find({ name: req.body.name })
-        .lean()
-        .exec()
-        .then(room => {
-            if (room.length >= 1) {
-                return res.status(409).json(
-                    'Room exists'
-                );
-            } else {
-                const room = new Room({
-                    roomAdmin: req.userData.userId,
-                    name: req.body.name
-                });
-                room.save()
-                    .then(result => {
-                        return res.status(200).json(room)
-                    });
-            }
-        });
+exports.createRoom = async (req, res) => {
+    Room.find({ name: req.body.name }).lean().exec().then(room => {
+        if (room.length >= 1) {
+            return res.status(409).json('Room exists');
+        } else {
+            const room = new Room({
+                roomAdmin: req.userData.userId,
+                name: req.body.name
+            });
+            room.save().then(async () => {
+                console.log(req.body)
+                if (req.body.invitation && req.body.invitation.length > 0) {
+                    await req.body.invitation.forEach(async (inv) => {
+                        const invit = new Invitation({
+                            sender: req.userData.userId,
+                            receiver: inv.value,
+                            roomid: room._id,
+                            accepted: false,
+                        });
+                        const token = jwt.sign({ _id: inv.value }, config.JWT_KEY_RESET, { expiresIn: "20m" })
+                        await invit.save();
+                        console.log("mail sended to", inv.email, inv.label, room.name)
+                        await sendMail(inv.email, 'Invitation to join room', 'Hello ' + inv.label + ',\n\n' + 'You\'re invited to join room' + room.name + '\n\n'
+                        + 'Please click on given link to reset your password: \nhttp:\/\/' + '127.0.0.1:3000' + '\/room\/invitation\/' + token + '\n\nThank You!\n');
+                    })
+                    return res.status(200).json(room)
+                }
+                else {
+                    return res.status(200).json(room)
+                }
+            });
+        }
+    });
 };
 
 exports.updateRoom = (req, res) => {
@@ -46,7 +63,7 @@ exports.deleteRoom = (req, res) => {
             res.status(400).json(error);
         }
         else if (room === null) {
-            res.status(404).json({ error: 'Server was unable to find this company' });
+            res.status(404).json({ error: 'Server was unable to find this room' });
         }
         else {
             res.status(200).json(room);

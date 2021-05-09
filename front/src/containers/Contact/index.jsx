@@ -46,7 +46,6 @@ const Contact = (props) => {
 
 	const classes = useStyles();
 	useEffect(() => {
-		console.log(props.user)
 		roomServices.getRoomByUser(props.user.userId)
 			.then(res => {
 				console.log(res);

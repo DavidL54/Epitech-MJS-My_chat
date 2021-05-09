@@ -10,7 +10,7 @@ import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
 import { userServices } from '../../redux/services/userServices';
 import { roomServices } from '../../redux/services/roomServices';
-import { toastSuccess } from '../../redux/actions/alertActions';
+import { toastError, toastSuccess } from '../../redux/actions/alertActions';
 import AsyncSelect from 'react-select/async';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 
@@ -63,15 +63,18 @@ const ModalRoom = (props) => {
   }, []);
 
   const create = () => {
-
     const body = JSON.stringify({
-      name
+      name,
+      invitation
     });
     roomServices.createRoom(body)
       .then(res => {
-        if (res.message) {
-          setmyRoom([...myRoom, {name}])
-          toastSuccess(res.message);
+        if (res.statusText && res.statusText === "KO") {
+          toastError(res.message);
+        }
+        else {
+          setmyRoom([...myRoom, res])
+          toastSuccess('Room created with success');
         }
       })
     setmodalRoom(false);
@@ -81,7 +84,7 @@ const ModalRoom = (props) => {
     userServices.getAll().then(res => {
       const finres = [];
       res.forEach(user => {
-        finres.push({label : `${user.name} ${user.firstname}`, value: user._id })
+        finres.push({label : `${user.name} ${user.firstname}`, value: user._id, email: user.email })
       })
       callback(finres);
     });

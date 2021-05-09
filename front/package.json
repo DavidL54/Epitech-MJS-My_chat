@@ -113,6 +113,8 @@
 		"resolve": "1.20.0",
 		"simplebar": "^5.3.0",
 		"smooth-scrollbar": "^8.6.0",
+		"socket.io": "^4.0.2",
+		"socket.io-client": "^4.0.2",
 		"style-loader": "2.0.0",
 		"styled-components": "^5.2.1",
 		"tempa-xlsx": "^0.8.20",

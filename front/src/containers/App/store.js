@@ -5,7 +5,8 @@ import {
     userReducer,
     authenticationReducer,
     sidebarReducer,
-    alertReducer
+    alertReducer,
+    socketReducer
 } from '../../redux/reducers/index';
 import thunk from 'redux-thunk';
 import logger from 'redux-logger';
@@ -20,6 +21,7 @@ const appReducer = combineReducers({
     user: userReducer,
     authentication: authenticationReducer,
     sidebar: sidebarReducer,
+    socket: socketReducer,
 });
 
 const rootReducer = (state, action) => {
