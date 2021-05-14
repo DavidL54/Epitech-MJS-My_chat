@@ -17,7 +17,7 @@ export default function user(state = initialState, action) {
 		case userConstants.GET_USER_REQUEST:
 			return { ...state, loading: action.isLoading }
 		case userConstants.GET_USER_SUCCESS:
-			return { ...state, accessToken: action.accessToken, refreshToken: action.refreshToken };
+			return action.user;
 		case userConstants.GET_USER_FAILURE:
 			return {};
 		case userConstants.UNLOAD_USER:

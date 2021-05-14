@@ -11,19 +11,16 @@ import 'react-redux-toastr/lib/css/react-redux-toastr.min.css';
 import { SnackbarProvider } from 'notistack';
 import Notifier from './Notifier';
 import { SocketContext, socket } from './SocketComponent';
-
 serviceWorker.unregister();
 
 const App = () => {
-    useEffect(() => {
-    }, []);
 
     return (
 
         <Provider store={store}>
+            <SocketContext.Provider value={socket}>
             <SnackbarProvider maxSnack={10}>
                 <Notifier />
-                <SocketContext.Provider value={socket}>
                 <BrowserRouter>
                     <Scroll>
                         <Fragment>
@@ -31,8 +28,8 @@ const App = () => {
                         </Fragment>
                     </Scroll>
                     </BrowserRouter>
+                </SnackbarProvider>
                 </SocketContext.Provider>
-            </SnackbarProvider>
         </Provider>
     )
 }

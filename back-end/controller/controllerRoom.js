@@ -4,6 +4,8 @@ const Invitation = require('../models/modelInvitation');
 const sendMail = require('../middleware/sendMail');
 const config = require('../config');
 const jwt = require('jsonwebtoken');
+var amqplib = require('amqplib');
+
 
 exports.getAll = (req, res) => {
     Room.find({}).lean().exec()
@@ -45,8 +47,15 @@ exports.createRoom = async (req, res) => {
                     })
                     return res.status(200).json(room)
                 }
-                else {
-                    return res.status(200).json(room)
+                else {                    
+                    var conn = await amqplib.connect('amqp://rabbitmq:5672', heartbeat=60);
+                    var ch = await conn.createChannel()
+                    await ch.assertExchange(`Room_${room._id}`, 'direct', { durable: true });
+                    await ch.bindQueue(`Queue_${req.userData.userId}`, `Room_${room._id}`, '');
+                        
+                    ch.close();
+                    conn.close();
+                    res.status(200).json(room)
                 }
             });
         }
@@ -58,7 +67,7 @@ exports.updateRoom = (req, res) => {
 };
 
 exports.deleteRoom = (req, res) => {
-    Room.deleteOne({ _id: req.params.id }, (error, room) => {
+    Room.deleteOne({ _id: req.params.id }, async (error, room) => {
         if (error) {
             res.status(400).json(error);
         }
@@ -66,13 +75,36 @@ exports.deleteRoom = (req, res) => {
             res.status(404).json({ error: 'Server was unable to find this room' });
         }
         else {
-            res.status(200).json(room);
+            console.log(`Room_${req.params.id}`);
+            var conn = await amqplib.connect('amqp://rabbitmq:5672', heartbeat = 60);
+            var ch = await conn.createChannel()
+            await ch.removeAllListeners(`Room_${req.params.id}`);
+            await ch.deleteExchange(`Room_${req.params.id}`);
+
+            ch.close();
+            conn.close();
+            res.status(200).json(room)
         }
     });
 }
 
 exports.getRoomByUser = (req, res) => {
     Room.find({ roomAdmin: req.params.id }).select('name').exec()
+        .then((rooms, err) => {
+            if (err) {
+                res.status(400).json(err);
+            }
+            else if (rooms === null) {
+                res.status(400).send({ error: 'Server was unable to find rooms' });
+            }
+            else {
+                res.status(200).json(rooms);
+            }
+        });
+}
+
+exports.getAllowRoomByUser = (req, res) => {
+    Room.find({ $or: [{ roomAdmin: req.params.id }, { allowUser: req.params.id }] }).select('name').exec()
         .then((rooms, err) => {
             if (err) {
                 res.status(400).json(err);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { connect } from 'react-redux'
 import clsx from 'clsx';
 import { userServices } from "../../redux/services/userServices";
@@ -23,7 +23,10 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import ContactPhoneIcon from '@material-ui/icons/ContactPhone';
 import PersonIcon from '@material-ui/icons/Person';
 import { sidebarActions } from '../../redux/actions/sidebarActions'
+import { loadReceivedMessage } from '../../redux/actions/socketAction'
 import { NavLink } from 'react-router-dom'
+import { SocketContext } from '../App/SocketComponent';
+import { auth } from '../../helpers/authHeader'
 
 const drawerWidth = 240;
 
@@ -169,12 +172,28 @@ const Layout = (props) => {
 	const classes = useStyles();
 	const theme = useTheme();
 	const [open, setOpen] = useState(true);
+	const [username, setusername] = useState("");
+	const socket = useContext(SocketContext);
+
 
 	useEffect(() => {
 		if (props.sidebar.visibility) {
 			setOpen(props.sidebar.visibility);
 		}
-	}, []);
+		if (props.user.name) {
+			setusername(`${props.user.name} ${props.user.firstname} ${props.user.userId}`)
+		}
+
+		socket.emit('connected', true);
+		const token = auth.getAccessToken();
+		socket.emit('authentificate', token);
+		props.loadReceivedMessage(socket);
+
+		return () => {
+			console.log("ca deconnecte");
+			socket.emit('connected', false);
+		}
+	}, [props.user]);
 
 	const handleDrawerOpen = () => {
 		setOpen(true);
@@ -213,7 +232,10 @@ const Layout = (props) => {
 						<MenuIcon/>
 					</IconButton>
 					<Typography className={classes.title} variant="h6" noWrap>
-						D.E.scord
+							D.E.scord
+					</Typography>
+						<Typography className={classes.title} variant="h6" noWrap>
+							{username}
 					</Typography>
 				</Toolbar>
 			</AppBar>
@@ -255,19 +277,21 @@ const Layout = (props) => {
 					</ListItem>
 				</List>
 			</Drawer>
-			<main className={classes.content}>
-				{props.children}
+			
+				<main className={classes.content}>
+					{props.children}
 				</main>
 		</div>
 	);
 }
 
 function mapStateToProps(state) {
-	return ({sidebar: state.sidebar})
+	return ({sidebar: state.sidebar, user: state.user})
 }
 
 const actionCreators = {
 	setSidebarState: sidebarActions.setSidebarState,
+	loadReceivedMessage
 }
 
 const connectedLayout = connect(mapStateToProps, actionCreators)(Layout)

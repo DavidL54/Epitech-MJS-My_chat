@@ -1,15 +1,15 @@
 import { List } from 'immutable';
 
-let id = 0;
-const initialState = { items: List([]) }
+const initialState = { message: [] }
 
 
 const reducer = (state = initialState, action) => {
+
   switch (action.type) {
-    case 'ADD_ITEM':
+    case 'ADD_MESSAGE':
       return {
         ...state,
-        items: state.items.push({ id: action.itemId, item: action.item, completed: action.completed })
+        message: action.message
       }
 
     case 'COMPLETED_ITEM':
@@ -22,7 +22,7 @@ const reducer = (state = initialState, action) => {
     case 'INITIAL_ITEMS':
       return {
         ...state,
-        items: List(action.items)
+        items: List(action.message)
       }
     // return {
     //     ...state,

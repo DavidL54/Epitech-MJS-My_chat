@@ -8,7 +8,6 @@ export const auth = {
 
 function authHeader() {
     const state = store.getState();
-    console.log(state);
     let auth;
     if (state.authentication.auth && state.authentication.auth.jwt) {
         auth = state.authentication.auth.jwt;        
@@ -22,7 +21,6 @@ function authHeader() {
 
 function getAccessToken() {
     const state = store.getState();
-    console.log(state);
     let auth;
     if (state.authentication.auth && state.authentication.auth.jwt) {
         auth = state.authentication.auth.jwt;

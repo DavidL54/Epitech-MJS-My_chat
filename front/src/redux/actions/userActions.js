@@ -2,6 +2,7 @@ import { userConstants } from "../constants/userConstants";
 import { userServices } from '../services/userServices';
 import { toastError, toastSuccess } from './alertActions';
 import { change } from 'redux-form';
+import jwt_decode from "jwt-decode";
 
 export const userActions = {
 	login,
@@ -24,7 +25,10 @@ function login(body, setredirectRecover) {
 				logged => {
 					if (logged.message && logged.message === "OK") {
 						userServices.generateLoginToken(logged);
+						var decoded = jwt_decode(logged.token);
+						localStorage.setItem('user', decoded)
 						dispatch(loginSuccess({ loggedIn: true, jwt: logged.token }))
+						dispatch(dispatchUser(decoded));
 						toastSuccess('Connexion réussie');
 					}
 					else if (logged.status == 401) {
@@ -50,4 +54,5 @@ function login(body, setredirectRecover) {
 	function loginRequest() { return { type: userConstants.LOGIN_REQUEST } }
 	function loginSuccess(auth) { return { type: userConstants.LOGIN_SUCCESS, auth } }
 	function loginFailure(error) { return { type: userConstants.LOGIN_FAILURE, error } }
+	function dispatchUser(user) { return { type: userConstants.GET_USER_SUCCESS, user } }
 }

@@ -5,7 +5,8 @@ import jwt_decode from 'jwt-decode';
 export const roomServices = {
     createRoom,
     deleteRoom,
-    getRoomByUser
+    getRoomByUser,
+    getAllowRoomByUser
 };
 
 function createRoom(body) {
@@ -26,6 +27,14 @@ function deleteRoom(id) {
 
 function getRoomByUser(id) {
     return apiClient.get(`/room/user/${id}`)
+        .then(handleResponse)
+        .then(data => {
+            return data
+        })
+}
+
+function getAllowRoomByUser(id) {
+    return apiClient.get(`/room/allow/user/${id}`)
         .then(handleResponse)
         .then(data => {
             return data

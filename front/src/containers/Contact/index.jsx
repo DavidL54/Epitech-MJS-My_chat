@@ -21,6 +21,7 @@ import { roomServices } from '../../redux/services/roomServices';
 import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { toastSuccess } from "../../redux/actions/alertActions";
+import { SocketContext, socket } from '../App/SocketComponent';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -51,7 +52,7 @@ const Contact = (props) => {
 				console.log(res);
 				setmyRoom(res);
 				toastSuccess
-		})
+			})
 	}, []);
 
 	const deleteRoom = (idroom) => {
@@ -113,7 +114,7 @@ const Contact = (props) => {
 						</Grid>
 					</Grid>
 				</div>
-				{ modalRoom ? <ModalRoom modalRoom={modalRoom} setmodalRoom={setmodalRoom} myRoom={myRoom} setmyRoom={setmyRoom}/> : <div /> }
+				{ modalRoom ? <ModalRoom modalRoom={modalRoom} setmodalRoom={setmodalRoom} myRoom={myRoom} setmyRoom={setmyRoom} /> : <div />}
 			</div>
 
 		)

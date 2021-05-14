@@ -1,10 +1,10 @@
 import axios from "axios"
 
-export const AddItem = (data) => ({
-  type: "ADD_ITEM",
-  item: data.item,
-  itemId: data.id,
-  completed: data.completed
+/*export const AddItem = (data) => ({
+  type: "ADD_MESSAGE",
+  user: data.user,
+  room: data.room,
+  message: data.message
 })
 
 export const completeItem = (data) => ({
@@ -13,26 +13,35 @@ export const completeItem = (data) => ({
   completed: data.completed
 })
 
-/* Used only by actions for sockets */
+//Used only by actions for sockets 
 export const initialItems = (res) => ({
   type: "INITIAL_ITEMS",
   items: res
-})
+})*/
 
-/***************************************************************************************** */
-/* Async Action items using - Sockets													   */
-/***************************************************************************************** */
-export const loadInitialDataSocket = (socket) => {
-  return (dispatch) => {
-    // dispatch(clearAllItems())
-    socket.on('initialList', (res) => {
-      console.dir(res)
-      dispatch(initialItems(res))
-    })
+
+export const loadReceivedMessage = (socket) => {
+  return (dispatch, getState) => {
+    socket.on('message', (roomid, mess) => {
+      const parsed = JSON.parse(mess)
+      const state = getState();
+      dispatch({ type: "ADD_MESSAGE", message: [...state.socket.message, parsed] });
+    });
   }
 }
 
-export const addNewItemSocket = (socket, id, item) => {
+export const sendMessage = (socket, roomid, message) => {
+  return (dispatch, getState) => {
+    const state = getState();
+    dispatch({ type: "ADD_MESSAGE", message: [...state.socket.message, { user: state.user.userId, room : roomid, message}] });
+    socket.emit('message', state.user.userId, roomid, message);
+  }
+}
+
+
+
+
+/* export const addNewItemSocket = (socket, id, item) => {
   return (dispatch) => {
     let postData = {
       id: id + 1,
@@ -51,4 +60,4 @@ export const markItemCompleteSocket = (socket, id, completedFlag) => {
     }
     socket.emit('markItem', postData)
   }
-}
+}*/
