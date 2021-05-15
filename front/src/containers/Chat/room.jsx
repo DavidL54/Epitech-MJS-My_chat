@@ -18,14 +18,10 @@ const Room = (props) => {
 
   useEffect(() => {
     roomServices.getAllowRoomByUser(props.user.userId)
-      .then(res => {
-        console.log(res);
-        setroom(res);
-      })
+      .then(res => { setroom(res); })
   }, [])
 
   const changeRoom = (roomid) => {
-    console.log(roomid);
     setselectedRoom(roomid);
   };
 

@@ -64,7 +64,7 @@ const wrappedRoutes = () => (
             <Layout>
             <Route exact path="/home" component={Home} />
                 <Route exact path="/chat" component={Chat} />
-                <Route exact path="/contact" component={Contact} />
+                <Route exact path="/contact/:invitation?/:token?" component={Contact} />
                 <Route exact path="/account" component={Account} />
             </Layout>
     </>

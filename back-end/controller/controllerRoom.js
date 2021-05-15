@@ -45,13 +45,12 @@ exports.createRoom = async (req, res) => {
                             sender: req.userData.userId,
                             receiver: inv.value,
                             roomid: room._id,
-                            accepted: false,
                         });
-                        const token = jwt.sign({ _id: inv.value }, config.JWT_KEY_RESET, { expiresIn: "20m" })
+                        const token = jwt.sign({ userid: inv.value, roomid: room._id, roomname: req.body.name, invit: 'joinroom', invitid: invit._id }, config.JWT_KEY_RESET, { expiresIn: "7d" })
                         await invit.save();
                         console.log("mail sended to", inv.email, inv.label, room.name)
-                        await sendMail(inv.email, 'Invitation to join room', 'Hello ' + inv.label + ',\n\n' + 'You\'re invited to join room' + room.name + '\n\n'
-                        + 'Please click on given link to reset your password: \nhttp:\/\/' + '127.0.0.1:3000' + '\/room\/invitation\/' + token + '\n\nThank You!\n');
+                        await sendMail(`D.E.scord <${inv.email}>`, 'Invitation to join room', 'Hello ' + inv.label + ',\n\n' + 'You\'re invited to join room' + room.name + '\n\n'
+                        + 'Please click on given link to reset your password: \nhttp:\/\/' + '127.0.0.1:3000' + '\/contact\/invitation\/' + token + '\n\nThank You!\n');
                     })
                     return res.status(200).json(room)
                 }

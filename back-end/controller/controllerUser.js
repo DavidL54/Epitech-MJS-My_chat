@@ -10,6 +10,7 @@ const Token = require('../models/modelToken')
 const config = require("../config")
 
 
+var amqplib = require('amqplib');
 
 exports.getAll = (req, res) => {
     User.find({}, (error, user) => {
@@ -26,7 +27,7 @@ exports.getAll = (req, res) => {
 };
 
 exports.signup = (req, res) => {
-    User.find({"$or": [{email: req.body.email}, {username: req.body.username}]})
+    User.find({ "$or": [{ email: req.body.email }, { username: req.body.username }] })
         .exec()
         .then(users => {
             for (const user in users) {
@@ -53,20 +54,29 @@ exports.signup = (req, res) => {
                         firstname: req.body.firstname,
                         age: req.body.age
                     });
-                    user.save()
-                        .then(result => {
-                            // generate token and save
-                            const token = new Token({
-                                _userId: user._id,
-                                token: crypto.randomBytes(16).toString('hex')
-                            });
-                            token.save()
-                            sendMail(user.email, 'Account Verification Link',
-                                'Hello ' + req.body.name + ',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/user\/confirmation\/' + user.email + '\/' + token.token + '\n\nThank You!\n');
-                            res.status(201).json({
-                                message: "User created"
-                            });
-                        })
+                    user.save().then(async () => {
+                        // generate token and save
+                        const token = new Token({
+                            _userId: user._id,
+                            token: crypto.randomBytes(16).toString('hex')
+                        });
+                        token.save()
+                        sendMail(user.email, 'Account Verification Link',
+                            'Hello ' + req.body.name + ',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/user\/confirmation\/' + user.email + '\/' + token.token + '\n\nThank You!\n');
+
+
+                        var conn = await amqplib.connect(config.RABBITURL);
+                        var ch = await conn.createChannel()
+                        await ch.assertQueue(`Queue_${user._id}`, { durable: true});
+                        await ch.close();
+                        await conn.close();
+
+
+
+                        res.status(201).json({
+                            message: "User created"
+                        });
+                    })
                         .catch(err => {
                             res.status(500).json({
                                 error: err
@@ -82,16 +92,16 @@ exports.signup = (req, res) => {
 };
 
 exports.confirmEmailToken = (req, res) => {
-    Token.findOne({token: req.params.token}, function (err, token) {
+    Token.findOne({ token: req.params.token }, function (err, token) {
         // token is not found into database i.e. token may have expired
         if (!token) {
-            return res.status(400).send({msg: 'Your verification link may have expired. Please click on resend for verify your Email.'});
+            return res.status(400).send({ msg: 'Your verification link may have expired. Please click on resend for verify your Email.' });
         } else {
             // if token is found then check valid user
-            User.findOne({_id: token._userId, email: req.params.email}, function (err, user) {
+            User.findOne({ _id: token._userId, email: req.params.email }, function (err, user) {
                 // not valid user
                 if (!user) {
-                    return res.status(401).send({msg: 'We were unable to find a user for this verification. Please SignUp!'});
+                    return res.status(401).send({ msg: 'We were unable to find a user for this verification. Please SignUp!' });
                 }
                 // user is already verified
                 else if (user.active) {
@@ -104,7 +114,7 @@ exports.confirmEmailToken = (req, res) => {
                     user.save(function (err) {
                         // error occur
                         if (err) {
-                            return res.status(500).send({msg: err.message});
+                            return res.status(500).send({ msg: err.message });
                         }
                         // account successfully verified
                         else {
@@ -119,7 +129,7 @@ exports.confirmEmailToken = (req, res) => {
 };
 
 exports.login = (req, res) => {
-    User.find({"$or": [{email: req.body.username}, {username: req.body.username}]}).exec()
+    User.find({ "$or": [{ email: req.body.username }, { username: req.body.username }] }).exec()
         .then((user, err) => {
             if (user.length < 1) {
                 return res.status(404).json('User doesn\'t exist');
@@ -153,12 +163,12 @@ exports.login = (req, res) => {
 };
 
 exports.generateLink = (req, res) => {
-    User.find({"$or": [{email: req.body.username}, {username: req.body.username}]})
+    User.find({ "$or": [{ email: req.body.username }, { username: req.body.username }] })
         .exec()
         .then(user => {
             // user is not found into database
             if (!user) {
-                return res.status(400).send({msg: 'We were unable to find a user with that email. Make sure your Email is correct!'});
+                return res.status(400).send({ msg: 'We were unable to find a user with that email. Make sure your Email is correct!' });
             }
             // user has been already verified
             else if (user[0].active) {
@@ -167,21 +177,21 @@ exports.generateLink = (req, res) => {
             // send verification link
             else {
                 // generate token and save
-                const token = new Token({_userId: user[0]._id, token: crypto.randomBytes(16).toString('hex')});
+                const token = new Token({ _userId: user[0]._id, token: crypto.randomBytes(16).toString('hex') });
                 token.save(function (err) {
                     if (err) {
-                        return res.status(500).send({msg: err.message});
+                        return res.status(500).send({ msg: err.message });
                     }
                     sendMail(user[0].mail, 'Account Verification Link',
                         'Hello ' + req.body.name + ',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/user\/confirmation\/' + user[0].email + '\/' + token.token + '\n\nThank You!\n')
-                        return res.status(200).send('A verification email has been sent to ' + user[0].email + '. It will be expire after one day. If you not get verification Email click on resend token.');
+                    return res.status(200).send('A verification email has been sent to ' + user[0].email + '. It will be expire after one day. If you not get verification Email click on resend token.');
                 });
             }
         });
 }
 
 exports.deleteUser = (req, res) => {
-    User.remove({id: req.params.userId})
+    User.remove({ id: req.params.userId })
         .exec()
         .then(result => {
             res.status(200).json({
@@ -196,7 +206,7 @@ exports.deleteUser = (req, res) => {
 };
 
 exports.forgotpass = (req, res) => {
-    User.find({"$or": [{email: req.body.username}, {username: req.body.username}]})
+    User.find({ "$or": [{ email: req.body.username }, { username: req.body.username }] })
         .exec()
         .then(user => {
             if (!user) {
@@ -223,15 +233,15 @@ exports.resetPass = (req, res) => {
         jwt.verify(token, config.JWT_KEY_RESET, (err, decodeData) => {
             if (err)
                 return res.status(200).json("error for verify token")
-            User.findOne({resetLink: token}, (err, user) => {
+            User.findOne({ resetLink: token }, (err, user) => {
                 if (err || !user)
                     return res.status(400).json("User with this token does not exist.")
                 bcrypt.hash(newPass, 10, (err, hash) => {
-                    user.updateOne({password: hash}, (err, result) => {
+                    user.updateOne({ password: hash }, (err, result) => {
                         if (err)
                             return res.status(400).json("reset password link error")
                         else {
-                            return res.status(200).json({message: "Your password has been changed"})
+                            return res.status(200).json({ message: "Your password has been changed" })
                         }
                     })
                 });
@@ -243,7 +253,7 @@ exports.resetPass = (req, res) => {
 exports.getUserByRoom = (req, res) => {
     Room.findById(req.params.id)
         .populate([{ path: 'roomAdmin', model: 'User', select: 'name firstname' },
-            { path: 'allowUser', model: 'User', select: 'name firstname' }])
+        { path: 'allowUser', model: 'User', select: 'name firstname' }])
         .exec()
         .then((rooms, err) => {
             if (err) {

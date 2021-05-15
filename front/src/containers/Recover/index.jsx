@@ -32,7 +32,6 @@ const Recover = props => {
   const [password, setpassword] = useState("");
 
   const { token } = useParams();
-  console.log(token);
 
   useEffect(() => {
     const form = props.form;
