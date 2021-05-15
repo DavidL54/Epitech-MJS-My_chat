@@ -29,8 +29,8 @@ mongoose.connect(config.DBHost, {
 function startRabbit() {
     amqp.connect(config.RABBITURL, function (err, conn) {
         if (err) {
-            console.error("[AMQP]", err.message);
-            return setTimeout(start, 1000);
+            console.log("[AMQP]", err.message);
+            // return setTimeout(start, 1000);
         }
         console.log("[AMQP] connected");
         controllerSocket.whenConnected(conn, io);
@@ -51,3 +51,7 @@ server.listen(port, () => {
     console.log("Server is listening on port ", port);
 });
 
+module.exports =  {
+    server : server,
+    mongoose: mongoose,
+};

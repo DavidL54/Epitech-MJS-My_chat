@@ -6,7 +6,10 @@ const sendMail = require('../middleware/sendMail')
 const User = require('../models/modelUser');
 const Room = require('../models/modelRoom');
 const Token = require('../models/modelToken')
-require("dotenv").config();
+
+const config = require("../config")
+
+
 
 exports.getAll = (req, res) => {
     User.find({}, (error, user) => {
@@ -124,17 +127,17 @@ exports.login = (req, res) => {
             bcrypt.compare(req.body.password, user[0].password, (err, result) => {
                 if (err)
                     return res.status(401).json('Auth failed');
-                if (!user[0].active) {
-                    return res.status(401).json('Your Email has not been verified. Please click on resend')
-                }
                 if (result) {
+                    if (!user[0].active) {
+                        return res.status(401).json('Your Email has not been verified. Please click on resend')
+                    }
                     const token = jwt.sign({
                             name: user[0].name,
                             firstname: user[0].firstname,
                             email: user[0].email,
                             userId: user[0]._id
                         },
-                        process.env.JWT_KEY, {
+                        config.JWT_KEY, {
                             expiresIn: "7d"
                         }
                     );
@@ -142,8 +145,9 @@ exports.login = (req, res) => {
                         message: 'OK',
                         token: token
                     })
+                } else {
+                    res.status(401).json('Wrong Password')
                 }
-                res.status(401).json('Wrong Password')
             });
         })
 };
@@ -198,7 +202,7 @@ exports.forgotpass = (req, res) => {
             if (!user) {
                 return res.status(400).json("user with the email does not exists.")
             }
-            const token = jwt.sign({_id: user[0]._id}, process.env.JWT_KEY_RESET, {expiresIn: "20m"})
+            const token = jwt.sign({_id: user[0]._id}, config.JWT_KEY_RESET, {expiresIn: "20m"})
             user[0].updateOne({resetLink: token}, (err, succes) => {
                 if (err) {
                     return res.status(400).json('reset password link error')
@@ -216,7 +220,7 @@ exports.resetPass = (req, res) => {
     const newPass = req.body.newpass
 
     if (token) {
-        jwt.verify(token, process.env.JWT_KEY_RESET, (err, decodeData) => {
+        jwt.verify(token, config.JWT_KEY_RESET, (err, decodeData) => {
             if (err)
                 return res.status(200).json("error for verify token")
             User.findOne({resetLink: token}, (err, user) => {
