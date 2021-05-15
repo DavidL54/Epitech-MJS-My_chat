@@ -30,7 +30,15 @@ exports.createRoom = async (req, res) => {
                 name: req.body.name
             });
             room.save().then(async () => {
-                console.log(req.body)
+                var conn = await amqplib.connect(config.RABBITURL);
+                var ch = await conn.createChannel()
+                await ch.assertExchange(`Room_${room._id}`, 'direct', { durable: true });
+                await ch.bindQueue(`Queue_${req.userData.userId}`, `Room_${room._id}`, '');
+
+                await ch.close();
+                await conn.close();
+
+
                 if (req.body.invitation && req.body.invitation.length > 0) {
                     await req.body.invitation.forEach(async (inv) => {
                         const invit = new Invitation({
@@ -48,13 +56,6 @@ exports.createRoom = async (req, res) => {
                     return res.status(200).json(room)
                 }
                 else {                    
-                    var conn = await amqplib.connect('amqp://rabbitmq:5672', heartbeat=60);
-                    var ch = await conn.createChannel()
-                    await ch.assertExchange(`Room_${room._id}`, 'direct', { durable: true });
-                    await ch.bindQueue(`Queue_${req.userData.userId}`, `Room_${room._id}`, '');
-                        
-                    ch.close();
-                    conn.close();
                     res.status(200).json(room)
                 }
             });

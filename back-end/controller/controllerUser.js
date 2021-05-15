@@ -4,6 +4,7 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const sendMail = require('../middleware/sendMail')
 const User = require('../models/modelUser');
+const Room = require('../models/modelRoom');
 const Token = require('../models/modelToken')
 require("dotenv").config();
 
@@ -234,3 +235,26 @@ exports.resetPass = (req, res) => {
         });
     }
 };
+
+exports.getUserByRoom = (req, res) => {
+    Room.findById(req.params.id)
+        .populate([{ path: 'roomAdmin', model: 'User', select: 'name firstname' },
+            { path: 'allowUser', model: 'User', select: 'name firstname' }])
+        .exec()
+        .then((rooms, err) => {
+            if (err) {
+                res.status(400).json(err);
+            }
+            else if (rooms === null) {
+                res.status(400).send({ error: 'Server was unable to find rooms' });
+            }
+            else {
+                const finRes = [];
+                finRes.push(rooms.roomAdmin)
+                rooms.allowUser.forEach(user => {
+                    finRes.push(user);
+                });
+                res.status(200).json(finRes);
+            }
+        });
+}

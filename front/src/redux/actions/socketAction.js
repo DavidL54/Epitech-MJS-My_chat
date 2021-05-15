@@ -1,25 +1,5 @@
 import axios from "axios"
 
-/*export const AddItem = (data) => ({
-  type: "ADD_MESSAGE",
-  user: data.user,
-  room: data.room,
-  message: data.message
-})
-
-export const completeItem = (data) => ({
-  type: "COMPLETED_ITEM",
-  itemId: data.id,
-  completed: data.completed
-})
-
-//Used only by actions for sockets 
-export const initialItems = (res) => ({
-  type: "INITIAL_ITEMS",
-  items: res
-})*/
-
-
 export const loadReceivedMessage = (socket) => {
   return (dispatch, getState) => {
     socket.on('message', (roomid, mess) => {
@@ -35,6 +15,14 @@ export const sendMessage = (socket, roomid, message) => {
     const state = getState();
     dispatch({ type: "ADD_MESSAGE", message: [...state.socket.message, { user: state.user.userId, room : roomid, message}] });
     socket.emit('message', state.user.userId, roomid, message);
+  }
+}
+
+export const chatHandler = (socket) => {
+  return (dispatch) => {
+    socket.on('chatstate', (mess) => {
+      dispatch({ type: "CHAT_STATE", chat: mess });
+    });
   }
 }
 

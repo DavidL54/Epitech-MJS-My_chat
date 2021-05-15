@@ -17,13 +17,14 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import HomeIcon from '@material-ui/icons/Home';
+import ChatIcon from '@material-ui/icons/Chat';
 import SearchIcon from '@material-ui/icons/Search';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import ContactPhoneIcon from '@material-ui/icons/ContactPhone';
 import PersonIcon from '@material-ui/icons/Person';
 import { sidebarActions } from '../../redux/actions/sidebarActions'
-import { loadReceivedMessage } from '../../redux/actions/socketAction'
+import { loadReceivedMessage, chatHandler } from '../../redux/actions/socketAction'
 import { NavLink } from 'react-router-dom'
 import { SocketContext } from '../App/SocketComponent';
 import { auth } from '../../helpers/authHeader'
@@ -188,6 +189,7 @@ const Layout = (props) => {
 		const token = auth.getAccessToken();
 		socket.emit('authentificate', token);
 		props.loadReceivedMessage(socket);
+		props.chatHandler(socket);
 
 		return () => {
 			console.log("ca deconnecte");
@@ -263,6 +265,10 @@ const Layout = (props) => {
 						<ListItemIcon className={classes.itemToolBar} ><HomeIcon/></ListItemIcon>
 						<ListItemText primary={"Accueil"}/>
 					</ListItem>
+					<ListItem button key={"chat"} component={NavLink} to="/chat">
+						<ListItemIcon className={classes.itemToolBar} ><ChatIcon /></ListItemIcon>
+						<ListItemText primary={"Chat"} />
+					</ListItem>
 					<ListItem button key={"contact"} component={NavLink} to="/contact">
 						<ListItemIcon className={classes.itemToolBar}><ContactPhoneIcon /></ListItemIcon>
 						<ListItemText primary={"Contact"} />
@@ -291,7 +297,8 @@ function mapStateToProps(state) {
 
 const actionCreators = {
 	setSidebarState: sidebarActions.setSidebarState,
-	loadReceivedMessage
+	loadReceivedMessage,
+	chatHandler
 }
 
 const connectedLayout = connect(mapStateToProps, actionCreators)(Layout)

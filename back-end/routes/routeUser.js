@@ -19,4 +19,6 @@ module.exports = (app) => {
         .put(controllerUser.forgotpass);
     app.route('/user/resetpassword/:token')
         .post(controllerUser.resetPass);
+    app.route('/user/room/:id')
+        .get(controllerUser.getUserByRoom);
 }

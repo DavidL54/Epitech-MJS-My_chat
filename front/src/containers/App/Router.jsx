@@ -54,10 +54,16 @@ const Contact = Loadable({
     loading: Loading
 });
 
+const Chat = Loadable({
+    loader: () => import("../Chat/index.jsx"),
+    loading: Loading
+});
+
 const wrappedRoutes = () => (
     <>
             <Layout>
-                <Route exact path="/home" component={Home} />
+            <Route exact path="/home" component={Home} />
+                <Route exact path="/chat" component={Chat} />
                 <Route exact path="/contact" component={Contact} />
                 <Route exact path="/account" component={Account} />
             </Layout>

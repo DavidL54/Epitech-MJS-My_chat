@@ -1,6 +1,6 @@
 import { List } from 'immutable';
 
-const initialState = { message: [] }
+const initialState = { message: [], chat: [] }
 
 
 const reducer = (state = initialState, action) => {
@@ -12,12 +12,10 @@ const reducer = (state = initialState, action) => {
         message: action.message
       }
 
-    case 'COMPLETED_ITEM':
+    case 'CHAT_STATE':
       return {
         ...state,
-        items: state.items.update(action.itemId - 1, (value) => {
-          return { ...value, completed: action.completed }
-        })
+        chat: action.chat
       }
     case 'INITIAL_ITEMS':
       return {
