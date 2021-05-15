@@ -46,6 +46,7 @@ app.get('/', (req, res) => {
 
 require('./routes/routeUser.js')(app);
 require('./routes/routeRoom.js')(app);
+require('./routes/routeMessage.js')(app);
 
 server.listen(port, () => {
     console.log("Server is listening on port ", port);

@@ -53,14 +53,14 @@ const Message = (props) => {
 	}, [props.socket, selectedRoom])
 
 	if (loaded === true) {
-		return (
+	return (
 			<>
 						<List dense={true}>
 							{roomMessage.map(con => {
-								if (con.room === selectedRoom) {
+								if (con.roomid === selectedRoom) {
 									return (
 										<ListItem>
-											{`${con.user} : `}<ListItemText
+											{`${con.sender} : `}<ListItemText
 												primary={con.message}
 											/>
 										</ListItem>
@@ -70,6 +70,7 @@ const Message = (props) => {
 						</List>
 			</>
 		)
+		return (<div/>)
 	}
 	else {
 		return (

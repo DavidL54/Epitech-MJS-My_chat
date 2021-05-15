@@ -56,9 +56,7 @@ const Contact = (props) => {
       chatServices.getUserByRoom(selectedRoom)
         .then(res => {
           setcontact(res);
-          // console.log(res);
         });
-      // console.log(props.socket.chat);
     }
   }, [props.socket, selectedRoom])
 
@@ -72,7 +70,6 @@ const Contact = (props) => {
               if (contactState[con._id] === 2) color = "green"
               else if (contactState[con._id] === 1) color = "yellow"
             }
-            console.log(con);
             return (
               <ListItem>
                 <FiberManualRecordIcon style={{ color }} />

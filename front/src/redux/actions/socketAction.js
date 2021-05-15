@@ -1,19 +1,21 @@
 import axios from "axios"
+import { chatServices } from '../services/chatServices'
 
 export const loadReceivedMessage = (socket) => {
   return (dispatch, getState) => {
-    socket.on('message', (roomid, mess) => {
+    socket.on('message', async (mess, idmess) => {
       const parsed = JSON.parse(mess)
-      const state = getState();
-      dispatch({ type: "ADD_MESSAGE", message: [...state.socket.message, parsed] });
+      await chatServices.postReceivedMessage(mess);
+      await dispatch({ type: "ADD_MESSAGE", message: parsed });
     });
   }
 }
 
 export const sendMessage = (socket, roomid, message) => {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     const state = getState();
-    dispatch({ type: "ADD_MESSAGE", message: [...state.socket.message, { user: state.user.userId, room : roomid, message}] });
+    await chatServices.postReceivedMessage(JSON.stringify({ sender: state.user.userId, roomid, message }))
+    await dispatch({ type: "ADD_MESSAGE", message: { sender: state.user.userId, roomid, message } });
     socket.emit('message', state.user.userId, roomid, message);
   }
 }
@@ -26,26 +28,9 @@ export const chatHandler = (socket) => {
   }
 }
 
-
-
-
-/* export const addNewItemSocket = (socket, id, item) => {
-  return (dispatch) => {
-    let postData = {
-      id: id + 1,
-      item: item,
-      completed: false
-    }
-    socket.emit('addItem', postData)
+export const Initmessage = () => {
+  return async (dispatch, getState) => {
+    const oldmessage = await chatServices.getLastMessage();
+    dispatch({ type: "INIT_MESSAGE", message: oldmessage });
   }
 }
-
-export const markItemCompleteSocket = (socket, id, completedFlag) => {
-  return (dispatch) => {
-    let postData = {
-      id: id,
-      completed: completedFlag
-    }
-    socket.emit('markItem', postData)
-  }
-}*/

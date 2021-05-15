@@ -12,7 +12,7 @@ import thunk from 'redux-thunk';
 import logger from 'redux-logger';
 
 const middlewares = [thunk, logger];
-// const middlewares = [thunk];
+//const middlewares = [thunk];
 
 const appReducer = combineReducers({
     toastr: toastrReducer,

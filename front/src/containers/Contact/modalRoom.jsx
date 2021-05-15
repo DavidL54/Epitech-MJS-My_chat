@@ -56,8 +56,6 @@ const ModalRoom = (props) => {
   const [invitation, setinvitation] = useState([]);
   const [availableinvit, setavailableinvit] = useState([]);
   
-  console.log("ca passe icic")
-  
   const classes = useStyles();
   useEffect(() => {
   }, []);

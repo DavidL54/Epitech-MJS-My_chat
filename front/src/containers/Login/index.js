@@ -44,15 +44,7 @@ const Login = props => {
 				username: username,
 				password: password,
 			});
-			//props.dispatch(change(`recover`, 'email', 'toto'));
 			props.login(body, setredirectRecover);
-			
-				/*.then((res) => {
-				if (res.statusText && res.statusText === "KO") {
-					console.log(res.message);
-					toastError(`Error : ${res.message}`);
-				}
-			})*/
 		}
 	}
 
