@@ -17,10 +17,12 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import { Loading } from '../../helpers/utils'
 import ModalRoom from './modalRoom';
+import ModalInvitation from './modalInvitation';
 import { roomServices } from '../../redux/services/roomServices';
 import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { toastSuccess } from "../../redux/actions/alertActions";
+import { useParams } from "react-router-dom";
 import { SocketContext, socket } from '../App/SocketComponent';
 
 
@@ -43,7 +45,9 @@ const useStyles = makeStyles((theme) => ({
 const Contact = (props) => {
 	const [loaded, setLoaded] = useState(true);
 	const [modalRoom, setmodalRoom] = useState(false);
+	const [modalinvit, setmodalinvit] = useState(false );
 	const [myRoom, setmyRoom] = useState([]);
+	const { invitation, token } = useParams();
 
 	const classes = useStyles();
 	useEffect(() => {
@@ -51,6 +55,8 @@ const Contact = (props) => {
 			.then(res => {
 				setmyRoom(res);
 			})
+		
+		if (invitation && token) setmodalinvit(true);
 	}, []);
 
 	const deleteRoom = (idroom) => {
@@ -113,6 +119,7 @@ const Contact = (props) => {
 					</Grid>
 				</div>
 				{ modalRoom ? <ModalRoom modalRoom={modalRoom} setmodalRoom={setmodalRoom} myRoom={myRoom} setmyRoom={setmyRoom} /> : <div />}
+				{ modalinvit ? <ModalInvitation modalinvit={modalinvit} setmodalinvit={setmodalinvit} token={token} /> : <div />}
 			</div>
 
 		)

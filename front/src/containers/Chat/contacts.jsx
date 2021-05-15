@@ -65,7 +65,7 @@ const Contact = (props) => {
       <>
         <List dense={true}>
           {contact.map(con => {
-            let color = 'red';
+            let color = 'grey';
             if (contactStateKeys.includes(con._id)) {
               if (contactState[con._id] === 2) color = "green"
               else if (contactState[con._id] === 1) color = "yellow"
