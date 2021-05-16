@@ -9,7 +9,7 @@ export const userServices = {
     generateLoginToken,
     recover,
     resetpasswordCallback,
-    getAll
+    getAll,
 };
 
 function generateLoginToken(auth) {

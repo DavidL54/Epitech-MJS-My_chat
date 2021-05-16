@@ -59,6 +59,9 @@ const Contact = (props) => {
           setcontact(formatedContact);
         });
     }
+    else {
+      setcontact([]);
+    }
   }, [props.socket.chat, selectedRoom])
 
   if (loaded === true) {

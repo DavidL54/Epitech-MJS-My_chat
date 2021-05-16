@@ -5,48 +5,70 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemIcon
+  ListItemIcon,
+  Button
 } from '@material-ui/core';
+import Dialog from '@material-ui/core/Dialog';
+import MuiDialogTitle from '@material-ui/core/DialogTitle';
+import MuiDialogContent from '@material-ui/core/DialogContent';
+import MuiDialogActions from '@material-ui/core/DialogActions';
 import Loader from "react-loader-spinner";
 import { sendMessage } from '../../redux/actions/socketAction'
 import { roomServices } from '../../redux/services/roomServices'
-import MenuOpenIcon from '@material-ui/icons/MenuOpen';
-import ModalRoom from './modalRoomMenu'
+import ClearIcon from '@material-ui/icons/Clear';
 
 
 const Room = (props) => {
   const { selectedRoom, setselectedRoom } = props;
   const [loaded, setLoaded] = useState(true);
+  const [modalRoom, setmodalRoom] = useState(false);
   const [room, setroom] = useState([]);
-  const [roomModal, setroomModal] = useState(false);
 
   useEffect(() => {
     roomServices.getAllowRoomByUser(props.user.userId)
       .then(res => { setroom(res); })
   }, [])
 
-  const changeRoom = (roomid) => {
-    setselectedRoom(roomid);
-  };
+  const leaveRoom = () => {
+    const newRoomArr = room.filter((item) => { return item._id.toString() !== selectedRoom.toString() })
+    setroom(newRoomArr);
+    setselectedRoom("");
+    setmodalRoom(false);
+  }
 
   if (loaded === true) {
     return (
       <>
         <List dense={true}>
           {room.map(con => {
-            const color = selectedRoom === con._id ? "#bf99db" : "transparent";
+            const color = selectedRoom === con._id ? "#0069B4" : "#5a98c4";
             return (
-              <ListItem button style={{ backgroundColor: color }}>
-                <ListItemIcon ><MenuOpenIcon onClick={() => { changeRoom(con._id); setroomModal(true); }}/></ListItemIcon>
+              <ListItem button style={{ backgroundColor: color, borderRadius: "5px", border: "1px black solid", margin: "5px" }}>
+                <ListItemIcon ><ClearIcon style={{ color: "red" }} onClick={() => { setselectedRoom(con._id); setmodalRoom(true); }} /></ListItemIcon>
                 <ListItemText
-                  onClick={() => changeRoom(con._id)}
                   primary={con.name}
+                  onClick={() => setselectedRoom(con._id)}
                 />
               </ListItem>
             )
           })}
         </List>
-        { roomModal ? <ModalRoom roomModal={roomModal} setroomModal={setroomModal} selectedRoom={selectedRoom} /> : <div />}
+        <Dialog onClose={() => setmodalRoom(false)} aria-labelledby="customized-dialog-title" open={modalRoom}>
+          <MuiDialogTitle onClose={() => setmodalRoom(false)}>
+            Leave Room
+           </MuiDialogTitle>
+          <MuiDialogContent dividers>
+            Are you sure you want leave this room ?
+            </MuiDialogContent>
+          <MuiDialogActions>
+            <Button autoFocus onClick={() => setmodalRoom(false)} type="submit" color="primary">
+              No
+          </Button>
+            <Button autoFocus onClick={leaveRoom}type="submit" color="primary">
+              Yes
+          </Button>
+          </MuiDialogActions>
+        </Dialog>
       </>
     )
   }

@@ -15,6 +15,7 @@ import { sendMessage } from '../../redux/actions/socketAction'
 import { makeStyles } from '@material-ui/core/styles';
 import { chatServices } from '../../redux/services/chatServices'
 import NewReleasesIcon from '@material-ui/icons/NewReleases';
+import Box from '@material-ui/core/Box';
 
 const useStyles = makeStyles((theme) => ({
 	item: {
@@ -82,14 +83,23 @@ const Message = (props) => {
 							if (con.new) {
 								newFlag = <NewReleasesIcon />;
 							}
-							return (
-								<ListItem>
-									{newFlag}
-									{`${displayName} : `}<ListItemText
-										primary={con.message}
-									/>
-								</ListItem>
-							)
+
+							if (con.sender == props.user.userId)
+								return (
+									<div style={{ width: '100%' }}>
+										<Box display="flex" justifyContent="flex-end" m={1} p={1}>
+											<Box p={1} borderRadius={10} bgcolor="#E0EC8A"> {con.message} {`: ${displayName}`}{newFlag}</Box>
+										</Box>
+									</div>
+								);
+							else
+								return (
+									<div style={{ width: '100%' }}>
+										<Box display="flex" justifyContent="flex-start" m={1} p={1}>
+											<Box p={1} borderRadius={10} bgcolor="#AECEE7"> {newFlag}{`${displayName} : `}{con.message}</Box>
+										</Box>
+									</div>
+								);
 						}
 					})}
 				</List>
@@ -117,3 +127,16 @@ const actionCreators = {
 }
 
 export default connect(mapStateToProps, actionCreators)(Message);
+
+/*
+
+		<ListItem display="flex" justifyContent="flex-end" style={{ backgroundColor: "#f7f7b7", borderRadius: "5px", margin: "5px" }}>
+									<Box display="flex" justifyContent="flex-end" m={1} p={1} bgcolor="background.paper">
+										{newFlag}{`${displayName} : `}
+										<ListItemText
+											primary={con.message}
+										/>
+									</Box>
+								</ListItem>
+
+								*/

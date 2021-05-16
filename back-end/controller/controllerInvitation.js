@@ -1,5 +1,6 @@
 const Invitation = require('../models/modelInvitation');
 const Room = require('../models/modelRoom');
+const User = require('../models/modelUser');
 const config = require('../config');
 const jwt = require('jsonwebtoken');
 var amqplib = require('amqplib');
@@ -111,3 +112,105 @@ exports.deleteInvit = (req, res) => {
         }
     });
 };
+
+
+async function isCommonRoom(useridone, useridtwo) {
+    const rooms = await Room.find({}).lean().exec();
+    let find = false;
+
+    await rooms.forEach(async (room) => {
+        const userOfroom = []
+        room.allowUser.forEach(user => userOfroom.push(user.toString()));
+        userOfroom.push(room.roomAdmin.toString());
+
+        if (userOfroom.includes(useridone) && userOfroom.includes(useridtwo)) {
+            find = true;
+        }
+    })
+    return (find);
+}
+
+exports.getAvalaibleUserInvitRoomcreate = (req, res) => {
+    const myid = req.userData.userId;
+    User.find({ _id: { $ne: myid } }).lean().exec()
+        .then( async (users, err) => {
+            if (err) {
+                res.status(400).json(err);
+            }
+            else if (users === null) {
+                res.status(400).send({ error: 'Server was unable to find Users' });
+            }
+            else {
+                let finRes = [];
+                for (let i = 0; i < users.length; i += 1) {
+                    let user = { ...users[i] }
+                    const iscommun = await isCommonRoom(myid, user._id.toString());
+                    user.iscommun = iscommun;
+                    finRes.push(user);
+                }
+
+                console.log(finRes);
+                res.status(200).json(finRes);
+            }
+        });
+}
+
+async function getAvailableInvitforRoom(users, room, myid){
+    const userOfroom = []
+    const blacklist = []
+    const finRes = []
+    room.allowUser.forEach(user => userOfroom.push(user.toString()));
+    userOfroom.push(room.roomAdmin.toString());
+    const invitAlreadySend = await Invitation.find({ roomid: room._id }).lean().exec();
+
+    for (const invit of invitAlreadySend) {
+        const delay = (Number(Date.now()) - Number(Date.parse(invit.created_at.toString()))) / 60000;
+
+        if ((invit.accepted && invit.accepted === false) || delay < 10080)
+            blacklist.push(invit.receiver.toString());
+    }
+
+    for (const user of users) {
+        if (!userOfroom.includes(user._id.toString()) && !blacklist.includes(user._id.toString())) {
+            let usercpy = { ...user }
+            const iscommun = await isCommonRoom( myid, user._id.toString());
+            usercpy.iscommun = iscommun;
+            finRes.push(usercpy);
+        }
+    }
+    return (finRes);
+}
+
+exports.getAvalaibleUserInvitRoomUpdate = (req, res) => {
+    const myid = req.userData.userId;
+    User.find({ _id: { $ne: myid } }).lean().exec()
+        .then(async (users, err) => {
+            if (err) {
+                res.status(400).json(err);
+            }
+            else if (users === null) {
+                res.status(400).send({ error: 'Server was unable to find Users' });
+            }
+            else {
+                const room = await Room.findById(req.params.roomid).lean().exec();
+                let finRes = await getAvailableInvitforRoom(users, room, myid);
+
+                res.status(200).json(finRes);
+            }
+        });
+}
+
+exports.getAvalaibleUserInvitAdmin = (req, res) => {
+    Room.findById(req.params.id).populate([{ path: 'allowUser', model: 'User', select: 'name firstname email' }]).lean().exec()
+        .then(async (users, err) => {
+            if (err) {
+                res.status(400).json(err);
+            }
+            else if (users === null) {
+                res.status(400).send({ error: 'Server was unable to find Users' });
+            }
+            else {
+                res.status(200).json(users.allowUser);
+            }
+        });
+}

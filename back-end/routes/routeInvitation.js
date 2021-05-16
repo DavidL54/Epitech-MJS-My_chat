@@ -10,4 +10,10 @@ module.exports = (app) => {
         .put(checkAuth, controllerInvitation.updateInvitState)
     app.route('/invitation/user/:id')
         .get(checkAuth, controllerInvitation.getAllInvitbyuser)
+    app.route('/invitation/availablecreateroom')
+        .get(checkAuth, controllerInvitation.getAvalaibleUserInvitRoomcreate);
+    app.route('/invitation/availableupdateroom/:roomid')
+        .get(checkAuth, controllerInvitation.getAvalaibleUserInvitRoomUpdate);
+    app.route('/invitation/availableadmin/:id')
+        .get(checkAuth, controllerInvitation.getAvalaibleUserInvitAdmin);
 }

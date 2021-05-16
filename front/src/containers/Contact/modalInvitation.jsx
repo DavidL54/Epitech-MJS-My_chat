@@ -72,7 +72,7 @@ const ModalRoom = (props) => {
   }
 
   return (
-    <Dialog onClose={() => setmodalinvit(false)} aria-labelledby="customized-dialog-title" open={modalinvit}>
+    <Dialog onClose={() => setmodalinvit(false)} open={modalinvit}>
         <MuiDialogTitle id="customized-dialog-title" onClose={() => setmodalinvit(false)}>
          Invitation
         </MuiDialogTitle>

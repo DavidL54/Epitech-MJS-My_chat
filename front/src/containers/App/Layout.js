@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
 	appBar: {
 		zIndex: theme.zIndex.drawer + 1,
 		color: "white",
-		backgroundColor: "#7909c4",
+		backgroundColor: "#0069B4",
 		transition: theme.transitions.create(['width', 'margin'], {
 			easing: theme.transitions.easing.sharp,
 			duration: theme.transitions.duration.leavingScreen,
@@ -52,15 +52,6 @@ const useStyles = makeStyles((theme) => ({
 			easing: theme.transitions.easing.sharp,
 			duration: theme.transitions.duration.enteringScreen,
 		}),
-	},
-
-	BottomBar: {
-		top: 'auto',
-		color: "white",
-		height: 100,
-		backgroundColor: "#282828",
-		bottom: 0,
-		zIndex: theme.zIndex.drawer + 1,
 	},
 
 	menuButton: {
@@ -76,14 +67,14 @@ const useStyles = makeStyles((theme) => ({
 	},
 	drawerOpen: {
 		width: drawerWidth,
-		backgroundColor: "#7909c4",
+		backgroundColor: "#0069B4",
 		transition: theme.transitions.create('width', {
 			easing: theme.transitions.easing.sharp,
 			duration: theme.transitions.duration.enteringScreen,
 		}),
 	},
 	drawerClose: {
-		backgroundColor: "#7909c4",
+		backgroundColor: "#0069B4",
 		transition: theme.transitions.create('width', {
 			easing: theme.transitions.easing.sharp,
 			duration: theme.transitions.duration.leavingScreen,
@@ -270,10 +261,6 @@ const Layout = (props) => {
 					<ListItem button key={"contact"} component={NavLink} to="/contact">
 						<ListItemIcon className={classes.itemToolBar}><ContactPhoneIcon /></ListItemIcon>
 						<ListItemText primary={"Contact"} />
-					</ListItem>
-					<ListItem button key={"account"} component={NavLink} to="/admin">
-						<ListItemIcon className={classes.itemToolBar}><PersonIcon /></ListItemIcon>
-						<ListItemText primary={"Compte"} />
 					</ListItem>
 					<ListItem onClick={logout} button key={"exit"}>
 						<ListItemIcon className={classes.itemToolBar}><ExitToAppIcon/></ListItemIcon>

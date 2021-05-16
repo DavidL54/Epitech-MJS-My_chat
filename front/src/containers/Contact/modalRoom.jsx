@@ -10,6 +10,7 @@ import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
 import { userServices } from '../../redux/services/userServices';
 import { roomServices } from '../../redux/services/roomServices';
+import { invitServices } from '../../redux/services/invitServices';
 import { toastError, toastSuccess } from '../../redux/actions/alertActions';
 import AsyncSelect from 'react-select/async';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
@@ -45,7 +46,8 @@ const customStyles = {
     fontSize: '16px',
     boxShadow: state.isFocused ? '0 0 0 1px #002984' : 0,
   }),
-  menu: (provided) => ({ ...provided, zIndex: 1 }),
+  menu: (provided) => ({ ...provided, zIndex: 9999 }),
+  menuPortal: base => ({ ...base, zIndex: 9999 })
 };
 
 const fieldStyle = { width: "100%", backgroundColor: "white", fontSize: "16px", borderRadius: "10px" };
@@ -79,10 +81,16 @@ const ModalRoom = (props) => {
   }
 
   const loadAvailableUser = (input, callback) => {
-    userServices.getAll().then(res => {
+    invitServices.getAvalaibleUserInvitRoomcreate().then(res => {
       const finres = [];
       res.forEach(user => {
-        finres.push({label : `${user.name} ${user.firstname}`, value: user._id, email: user.email })
+        let addimmediat = user.iscommun ? "(Instant Add)" : '';
+        finres.push({
+          label: `${user.name} ${user.firstname} ${addimmediat}`,
+          value: user._id,
+          email: user.email,
+          iscommun: user.iscommun
+        })
       })
       callback(finres);
     });
@@ -94,7 +102,7 @@ const ModalRoom = (props) => {
         onSubmit={create}
         onError={errors => console.log(errors)}
       >
-      <MuiDialogTitle id="customized-dialog-title" onClose={() => setmodalRoom(false)}>
+      <MuiDialogTitle onClose={() => setmodalRoom(false)}>
         Create Room
         </MuiDialogTitle>
       <MuiDialogContent dividers>
@@ -119,6 +127,7 @@ const ModalRoom = (props) => {
           isClearable
           value={invitation || ''}
           onChange={(e) => { setinvitation(e) }}
+          menuPosition={'fixed'}
           />
       </MuiDialogContent>
       <MuiDialogActions>

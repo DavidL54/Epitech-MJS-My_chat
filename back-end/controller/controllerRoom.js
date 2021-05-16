@@ -20,6 +20,38 @@ exports.getAll = (req, res) => {
 
 };
 
+async function createBindingRoom(idroom, iduser) {
+    var conn = await amqplib.connect(config.RABBITURL);
+    var ch = await conn.createChannel();
+    await ch.assertExchange(`Room_${idroom}`, 'direct', { durable: true });
+    await ch.bindQueue(`Queue_${iduser}`, `Room_${idroom}`, '');
+    await ch.close();
+    await conn.close();
+}
+
+async function treatInvit(req, room, invitations) {
+    let addimmediatUsers = [];
+    for (const inv of invitations) {
+        if (inv.iscommun) {
+            await createBindingRoom(room._id, inv.value);
+            addimmediatUsers.push(inv.value.toString());
+        }
+        else {
+            const invit = new Invitation({
+                sender: req.userData.userId,
+                receiver: inv.value,
+                roomid: room._id,
+            });
+            const token = jwt.sign({ userid: inv.value, roomid: room._id, roomname: req.body.name, invit: 'joinroom', invitid: invit._id }, config.JWT_KEY_RESET, { expiresIn: "7d" })
+            await invit.save();
+            console.log("mail sended to", inv.email, inv.label, room.name)
+            await sendMail(`D.E.scord <${inv.email}>`, 'Invitation to join room', 'Hello ' + inv.label + ',\n\n' + 'You\'re invited to join room' + room.name + '\n\n'
+                + 'Please click on given link to reset your password: \nhttp:\/\/' + '127.0.0.1:3000' + '\/contact\/invitation\/' + token + '\n\nThank You!\n');
+        }
+    }
+    await Room.findByIdAndUpdate(room._id, { allowUser: addimmediatUsers }, { new: true },).exec();
+}
+
 exports.createRoom = async (req, res) => {
     Room.find({ name: req.body.name }).lean().exec().then(room => {
         if (room.length >= 1) {
@@ -30,31 +62,12 @@ exports.createRoom = async (req, res) => {
                 name: req.body.name
             });
             room.save().then(async () => {
-                var conn = await amqplib.connect(config.RABBITURL);
-                var ch = await conn.createChannel()
-                await ch.assertExchange(`Room_${room._id}`, 'direct', { durable: true });
-                await ch.bindQueue(`Queue_${req.userData.userId}`, `Room_${room._id}`, '');
-
-                await ch.close();
-                await conn.close();
-
-
+                await createBindingRoom(room._id, req.userData.userId);
                 if (req.body.invitation && req.body.invitation.length > 0) {
-                    await req.body.invitation.forEach(async (inv) => {
-                        const invit = new Invitation({
-                            sender: req.userData.userId,
-                            receiver: inv.value,
-                            roomid: room._id,
-                        });
-                        const token = jwt.sign({ userid: inv.value, roomid: room._id, roomname: req.body.name, invit: 'joinroom', invitid: invit._id }, config.JWT_KEY_RESET, { expiresIn: "7d" })
-                        await invit.save();
-                        console.log("mail sended to", inv.email, inv.label, room.name)
-                        await sendMail(`D.E.scord <${inv.email}>`, 'Invitation to join room', 'Hello ' + inv.label + ',\n\n' + 'You\'re invited to join room' + room.name + '\n\n'
-                        + 'Please click on given link to reset your password: \nhttp:\/\/' + '127.0.0.1:3000' + '\/contact\/invitation\/' + token + '\n\nThank You!\n');
-                    })
-                    return res.status(200).json(room)
+                    treatInvit(req, room, req.body.invitation);
+                    res.status(200).json(room)
                 }
-                else {                    
+                else {
                     res.status(200).json(room)
                 }
             });
@@ -62,8 +75,31 @@ exports.createRoom = async (req, res) => {
     });
 };
 
-exports.updateRoom = (req, res) => {
+async function defineNewAdmin(newadminid, room) {
 
+    const oldadmin = room.roomAdmin.toString();
+    const allowWithoutAdm = room.allowUser.filter((item) => { return item.toString() !== newadminid.toString() })
+    allowWithoutAdm.push(oldadmin);
+
+    const ret = await Room.findByIdAndUpdate(room._id, { allowUser: allowWithoutAdm, roomAdmin: newadminid }, { new: true },).exec();
+    console.log(ret);
+}
+
+exports.updateRoom = (req, res) => {
+    Room.findById(req.params.id).lean().exec().then(async (room) => {
+        if (room.length === null) {
+            return res.status(409).json('Room exists');
+        } else {
+            console.log(req.body)
+            if (req.body.invitation && req.body.invitation.length > 0) {
+                await treatInvit(req, room, req.body.invitation);
+            }
+            if (req.body.admin) {
+                await defineNewAdmin(req.body.admin.value, room)
+            }
+            res.status(200).json(room)
+        }
+    });
 };
 
 exports.deleteRoom = (req, res) => {
@@ -76,7 +112,7 @@ exports.deleteRoom = (req, res) => {
         }
         else {
             console.log(`Room_${req.params.id}`);
-            var conn = await amqplib.connect('amqp://rabbitmq:5672', heartbeat = 60);
+            var conn = await amqplib.connect(config.RABBITURL, heartbeat = 60);
             var ch = await conn.createChannel()
             await ch.removeAllListeners(`Room_${req.params.id}`);
             await ch.deleteExchange(`Room_${req.params.id}`);
