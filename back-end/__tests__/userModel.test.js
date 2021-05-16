@@ -1,16 +1,16 @@
-var mongoose = require("mongoose")
-var mongoDB = "mongodb://127.0.0.1:27017/my_test_database"
+const mongoose = require("mongoose")
+const mongoDB = "mongodb://127.0.0.1:27017/my_test_database"
 
 mongoose.connect(mongoDB).then(r =>
     console.log("Successfully connected to the database")
 )
 
 const User = require("../models/modelUser")
+const templates = require('../__config_tests__/templates')
 
 describe("test", () => {
     beforeAll(async () => {
         await User.remove({});
-
     });
 
     afterEach(async () => {
@@ -27,14 +27,8 @@ describe("test", () => {
     })
     describe("User testing", () => {
 
-        const userTemplate = {
-            email : "elian.nicaise54@gmail.com",
-            password: 'PAPA',
-            username: "elian",
-            name: 'elian',
-            firstname: 'papa',
-            age: 19
-        }
+        const userTemplate = templates.userTemplate
+
         it('gets a user', async () => {
             const user = new User(userTemplate)
             await user.save();

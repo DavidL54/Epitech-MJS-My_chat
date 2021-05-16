@@ -17,7 +17,6 @@ exports.getAll = (req, res) => {
                 return res.status(200).json(room);
             }
         });
-
 };
 
 exports.createRoom = async (req, res) => {
@@ -76,7 +75,7 @@ exports.deleteRoom = (req, res) => {
         }
         else {
             console.log(`Room_${req.params.id}`);
-            var conn = await amqplib.connect('amqp://rabbitmq:5672', heartbeat = 60);
+            var conn = await amqplib.connect('amqp://127.0.0.1:5672', heartbeat = 60);
             var ch = await conn.createChannel()
             await ch.removeAllListeners(`Room_${req.params.id}`);
             await ch.deleteExchange(`Room_${req.params.id}`);

@@ -1,5 +1,5 @@
-var mongoose = require("mongoose")
-var mongoDB = "mongodb://127.0.0.1:27017/my_test_database_room"
+const mongoose = require("mongoose")
+const mongoDB = "mongodb://127.0.0.1:27017/my_test_database_room"
 
 mongoose.connect(mongoDB).then(r =>
     console.log("Successfully connected to the database")
@@ -8,12 +8,13 @@ mongoose.connect(mongoDB).then(r =>
 const Room = require("../models/modelRoom")
 const User = require("../models/modelUser")
 
+const templates = require('../__config_tests__/templates')
+
 describe("test", () => {
+
     beforeAll(async () => {
         await Room.remove({});
         await User.remove({});
-
-
     });
 
     afterEach(async () => {
@@ -31,24 +32,9 @@ describe("test", () => {
         expect(Room).toBeDefined();
     })
     describe("Room testing", () => {
-
-        const roomTemplate = {
-            roomAdmin : "",
-            name: 'elian',
-            allowUser: ""
-        }
-
-        const userTemplate = {
-            email : "elian.nicaise54@gmail.com",
-            password: 'PAPA',
-            username: "elian",
-            name: 'elian',
-            firstname: 'papa',
-            age: 19
-        }
-
         it('gets a room', async () => {
-            const user = new User(userTemplate)
+            const roomTemplate = templates.userTemplate
+            const user = new User(roomTemplate)
             await user.save();
 
 

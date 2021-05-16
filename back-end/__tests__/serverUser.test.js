@@ -3,7 +3,7 @@ const server = require('../server') // Link to your server file
 const superTest = require('supertest')
 const request = superTest(server.server)
 
-const {setUp} = require('../setUp')
+const {setUp} = require('../__config_tests__/setUp')
 setUp(server.mongoose)
 
 
@@ -11,15 +11,48 @@ const jwt = require('jsonwebtoken')
 const config = require('../config')
 
 const User = require('../models/modelUser')
+const Room = require('../models/modelRoom')
 
-const userTemplate = {
-    email: "elian.nicaise54@gmail.com",
-    password: 'PAPA',
-    username: "elian",
-    name: 'elian',
-    firstname: 'papa',
-    age: 19,
+const templates = require('../__config_tests__/templates')
+
+const userTemplate = templates.userTemplate
+
+
+async function createUser(loginTemplate, userTemplate) {
+    const req = await request.post('/user/signup')
+        .send(userTemplate)
+    const res = await request.post('/user/login').send(loginTemplate)
+
+    return res
 }
+
+async function createActiveUser(loginTemplate) {
+    const req = await request.post('/user/signup')
+        .send(userTemplate)
+    const user = await User.find({"$or": [{email: loginTemplate.username}, {username: loginTemplate.username}]})
+
+    user[0].active = true
+    await user[0].save()
+
+    return user[0]
+}
+
+async function createRoom(loginTemplate) {
+    await createActiveUser(loginTemplate)
+
+    const res = await request.post('/user/login')
+        .send(loginTemplate)
+    const token = res.body.token
+
+    const decoded = jwt.verify(token, config.JWT_KEY);
+
+    const create = await request.post('/room')
+        .set('authorization', `Bearer ${token}`)
+        .send({roomAdmin: decoded.userId, name: 'test'})
+
+    return { room : create, decoded: decoded, token: token}
+}
+
 
 describe("User routes", () => {
     describe("Sign UP route", () => {
@@ -46,6 +79,7 @@ describe("User routes", () => {
 
             done()
         })
+
         it('Sign UP with the same username', async done => {
             const res = await request.post('/user/signup')
                 .send(userTemplate)
@@ -64,18 +98,10 @@ describe("User routes", () => {
     })
     describe("Login In route", () => {
 
-        const loginTemplate = {
-            username: "elian",
-            password: "PAPA"
-        }
+        const loginTemplate = templates.loginTemplate
 
         it('SignUp', async done => {
-            const req = await request.post('/user/signup')
-                .send(userTemplate)
-            const user = await User.find({"$or": [{email: loginTemplate.username}, {username: loginTemplate.username}]})
-
-            user[0].active = true
-            await user[0].save()
+            await createActiveUser(loginTemplate)
 
             const res = await request.post('/user/login')
                 .send(loginTemplate)
@@ -88,49 +114,35 @@ describe("User routes", () => {
 
         it('Sign Up wrong pass', async done => {
             loginTemplate.password = "ll"
-            const req = await request.post('/user/signup')
-                .send(userTemplate)
-            const res = await request.post('/user/login')
-                .send(loginTemplate)
+            const res = await createUser(loginTemplate, userTemplate)
 
             expect(res.status).toEqual(401)
             expect(res.body).toEqual("Wrong Password")
             done()
         })
         it('Sign Up user doesn t exist', async done => {
-            const req = await request.post('/user/signup')
-                .send(userTemplate)
-            const res = await request.post('/user/login').send({username: "paperer43545"})
+            const res = await createUser({username: "paperer43545"}, userTemplate)
 
             expect(res.status).toEqual(404)
             expect(res.body).toEqual("User doesn\'t exist")
             done()
         })
     });
+    describe('Deleted user', () => {
 
-    describe('Delete user', () => {
-
-        const loginTemplate = {
-            username: "elian",
-            password: "PAPA"
-        }
+        const loginTemplate = templates.loginTemplate
 
         it('Remove User', async done => {
-            const req = await request.post('/user/signup')
-                .send(userTemplate)
-            const user = await User.find({"$or": [{email: loginTemplate.username}, {username: loginTemplate.username}]})
 
-            user[0].active = true
-            await user[0].save()
+            loginTemplate.password = "PAPA"
+            await createActiveUser(loginTemplate)
 
             const res = await request.post('/user/login')
                 .send(loginTemplate)
             const token = res.body.token
-
             const decoded = jwt.verify(token, config.JWT_KEY);
             const remove = await request.delete(`/user/${decoded.userId}`)
                 .set('authorization', `Bearer ${token}`)
-
 
             expect(remove.status).toEqual(200)
             expect(remove.body.message).toEqual("User deleted")
@@ -142,32 +154,23 @@ describe("User routes", () => {
 
 describe("Room routes", () => {
     describe("Get room", () => {
-        const loginTemplate = {
-            username: "elian",
-            password: "PAPA"
-        }
         it('Create Room', async done => {
-            const req = await request.post('/user/signup')
-                .send(userTemplate)
-            const user = await User.find({"$or": [{email: loginTemplate.username}, {username: loginTemplate.username}]})
+            const create = await createRoom(templates.loginTemplate)
 
-            user[0].active = true
-            await user[0].save()
-
-            const res = await request.post('/user/login')
-                .send(loginTemplate)
-            const token = res.body.token
-
-            const decoded = jwt.verify(token, config.JWT_KEY);
-
-            const create = await request.post('/room')
-                .set('authorization', `Bearer ${token}`)
-                .send({roomAdmin: decoded.userId, name: 'test'})
-
-            console.log(create)
-
+            expect(create.room.body.name).toEqual("test")
+            expect(create.room.body.roomAdmin).toEqual(create.decoded.userId)
+            expect(create.room.body.allowUser).toEqual([])
             done()
         })
+        it('Create Room exists', async done => {
+            const create = await createRoom(templates.loginTemplate)
+            const createTwo = await createRoom(templates.loginTemplate)
+
+            expect(createTwo.room.status).toEqual(409)
+            expect(createTwo.room.body).toEqual("Room exists")
+            done()
+        })
+
         // it('Sign UP with the same mail adress', async done => {
         //     const res = await request.post('/user/signup')
         //         .send(userTemplate)
@@ -182,6 +185,33 @@ describe("Room routes", () => {
         //
         //     done()
         // })
+    })
+    describe('Deleted room', () => {
+        it( 'Delete Room', async done => {
+            const create = await createRoom((templates.loginTemplate))
+            const findRoomBefore = await Room.find({})
+
+            expect(findRoomBefore.length).toEqual(1)
+
+            const deleteRoom = await request.delete(`/room/${create.room.body._id}`)
+                .set('authorization', `Bearer ${create.token}`)
+            const findRoomAfter = await Room.find({})
+
+            expect(deleteRoom.status).toEqual(200)
+            expect(findRoomAfter.length).toEqual(0)
+            done()
+        })
+
+        it( 'Delete Room doesn t exist', async done => {
+            const create = await createRoom((templates.loginTemplate))
+            const deleteRoom = await request.delete(`/room/123456`)
+                .set('authorization', `Bearer ${create.token}`)
+
+            expect(deleteRoom.status).toEqual(400)
+
+            done()
+        })
+
     })
 });
 
