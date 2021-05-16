@@ -1,6 +1,6 @@
 import { List } from 'immutable';
 
-const initialState = { message: [], chat: [] }
+const initialState = { message: [], chat: [], tap: [] }
 
 
 const reducer = (state = initialState, action) => {
@@ -22,7 +22,16 @@ const reducer = (state = initialState, action) => {
         ...state,
         chat: action.chat
       }
-
+    case 'CHAT_TAPPING_ADD':
+      return {
+        ...state,
+        tap: [...state.tap, action.tap]
+      }
+    case 'CHAT_TAPPING_REMOVE':
+      return {
+        ...state,
+        tap: state.tap.filter(item => item !== action.tap),
+      }
     default:
       return state
   }

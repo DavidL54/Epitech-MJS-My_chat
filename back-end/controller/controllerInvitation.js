@@ -4,6 +4,47 @@ const config = require('../config');
 const jwt = require('jsonwebtoken');
 var amqplib = require('amqplib');
 
+async function userJoinRoom(req, res, info) {
+    await Invitation.findOneAndUpdate({ _id: info.invitid }, { accepted: req.body.res }, { new: true }).exec();
+
+    if (req.body.res) {
+        var conn = await amqplib.connect(config.RABBITURL);
+        var ch = await conn.createChannel();
+        await ch.assertQueue(`Queue_${info.userid}`, { durable: true });
+        await ch.bindQueue(`Queue_${info.userid}`, `Room_${info.roomid}`, '');
+        await ch.close();
+        await conn.close();
+        const room = await Room.findById(info.roomid).exec();
+        if (!room.allowUser.includes(info.userid)) {
+            let newAllow = [...room.allowUser];
+            newAllow.push(info.userid);
+            console.log("update");
+            await Room.findOneAndUpdate({ _id: info.roomid }, { allowUser: newAllow }, { new: true }).exec();
+            res.status(200).json("You have accepted successfully")
+        }
+        else {
+            await ch.unbindQueue(`Queue_${info.userid}`, `Room_${info.roomid}`, '');
+        }
+    }
+    else {
+        res.status(200).json("You answered successfully")
+    }
+}
+
+async function changeAdminRoom(req, res, info) {
+    await Invitation.findOneAndUpdate({ _id: info.invitid }, { accepted: req.body.res }, { new: true }).exec();
+    if (req.body.res) {
+        const room = await Room.findById(info.roomid).exec();
+        let newAllow = [...room.allowUser];
+        newAllow = newAllow.filter(function (value) { return value !== info.userid; });
+        await Room.findOneAndUpdate({ _id: info.roomid }, { roomAdmin: info.userid, allowUser : newAllow }, { new: true }).exec();
+        res.status(200).json("You have accepted successfully")
+    }
+    else {
+        res.status(200).json("You answered successfully")
+    }
+}
+
 exports.getAllInvitbyuser = (req, res) => {
     Invitation.find({ receiver : req.params.id }).lean().exec()
         .then((invit, err) => {
@@ -48,30 +89,10 @@ exports.updateInvitState = (req, res) => {
             if (err) return res.status(200).json("error for verify token")
             console.log(info);
             if (info.invit === "joinroom") {
-                await Invitation.findOneAndUpdate({ _id: info.invitid }, { accepted: req.body.res }, { new: true }).exec();
-
-                if (req.body.res) {
-                    var conn = await amqplib.connect(config.RABBITURL);
-                    var ch = await conn.createChannel();
-                    await ch.assertQueue(`Queue_${info.userid}`, { durable: true });
-                    await ch.bindQueue(`Queue_${info.userid}`, `Room_${info.roomid}`, '');
-                    await ch.close();
-                    await conn.close();
-                    const room = await Room.findById(info.roomid).exec();
-                    if (!room.allowUser.includes(info.userid)) {
-                        let newAllow = [...room.allowUser];
-                        newAllow.push(info.userid);
-                        console.log("update");
-                        await Room.findOneAndUpdate({ _id: info.roomid }, { allowUser: newAllow }, { new: true }).exec();
-                        res.status(200).json("You have accepted successfully")
-                    }
-                    else {
-                        await ch.unbindQueue(`Queue_${info.userid}`, `Room_${info.roomid}`, '');
-                    }
-                }
-                else {
-                    res.status(200).json("You answered successfully")
-                }
+                userJoinRoom(req, res, info);
+            }
+            else if (info.invit === "joinadmin") {
+                changeAdminRoom(req, res, info)
             }
         });
     }

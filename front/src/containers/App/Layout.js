@@ -24,7 +24,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import ContactPhoneIcon from '@material-ui/icons/ContactPhone';
 import PersonIcon from '@material-ui/icons/Person';
 import { sidebarActions } from '../../redux/actions/sidebarActions'
-import { loadReceivedMessage, chatHandler, Initmessage } from '../../redux/actions/socketAction'
+import { loadReceivedMessage, chatHandler, tappingHandler } from '../../redux/actions/socketAction'
 import { NavLink } from 'react-router-dom'
 import { SocketContext } from '../App/SocketComponent';
 import { auth } from '../../helpers/authHeader'
@@ -186,9 +186,9 @@ const Layout = (props) => {
 			socket.emit('connected', true);
 			const token = auth.getAccessToken();
 			socket.emit('authentificate', token);
-			props.Initmessage();
 			props.loadReceivedMessage(socket);
 			props.chatHandler(socket);
+			props.tappingHandler(socket);
 		}
 		return () => {
 			socket.emit('connected', false);
@@ -297,7 +297,7 @@ const actionCreators = {
 	setSidebarState: sidebarActions.setSidebarState,
 	loadReceivedMessage,
 	chatHandler,
-	Initmessage
+	tappingHandler
 }
 
 const connectedLayout = connect(mapStateToProps, actionCreators)(Layout)

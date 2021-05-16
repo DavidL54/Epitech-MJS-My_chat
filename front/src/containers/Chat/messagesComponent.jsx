@@ -13,6 +13,8 @@ import Loader from "react-loader-spinner";
 import { SocketContext } from '../App/SocketComponent';
 import { sendMessage } from '../../redux/actions/socketAction'
 import { makeStyles } from '@material-ui/core/styles';
+import { chatServices } from '../../redux/services/chatServices'
+import NewReleasesIcon from '@material-ui/icons/NewReleases';
 
 const useStyles = makeStyles((theme) => ({
 	item: {
@@ -42,35 +44,58 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Message = (props) => {
-	const { selectedRoom } = props;
+	const { selectedRoom, contact } = props;
 	const [loaded, setLoaded] = useState(true);
 	const [roomMessage, setroomMessage] = useState([]);
-	const socket = useContext(SocketContext);
-	const classes = useStyles();
-
+	const contactKeys = Object.keys(contact);
+	
+	
 	useEffect(() => {
-		setroomMessage(props.socket.message);
-	}, [props.socket, selectedRoom])
+		if (selectedRoom) {
+			chatServices.getLastMessageByRoomId(selectedRoom)
+				.then(async (res) => {
+					const idmsg = [];
+					await res.forEach(msg => idmsg.push(msg.idmsg));
+					let ret = [...res];
+					await props.socket.message.forEach(msg => {
+						if (!idmsg.includes(msg.idmsg))
+							ret.push(msg)
+					})
+					const reversed = await ret.reverse()
+					setroomMessage(reversed);
+				})
+		}
+	}, [props.socket.message, selectedRoom])
 
 	if (loaded === true) {
-	return (
+		return (
 			<>
-						<List dense={true}>
-							{roomMessage.map(con => {
-								if (con.roomid === selectedRoom) {
-									return (
-										<ListItem>
-											{`${con.sender} : `}<ListItemText
-												primary={con.message}
-											/>
-										</ListItem>
-									)
-								}
-							})}
-						</List>
+				<List dense={true}>
+					{roomMessage.map(con => {
+						if (con.roomid === selectedRoom) {
+							let displayName = '';
+							if (contactKeys.includes(con.sender)) {
+								displayName = contact[con.sender].name;
+							}
+							let newFlag = (<div />)
+
+							if (con.new) {
+								newFlag = <NewReleasesIcon />;
+							}
+							return (
+								<ListItem>
+									{newFlag}
+									{`${displayName} : `}<ListItemText
+										primary={con.message}
+									/>
+								</ListItem>
+							)
+						}
+					})}
+				</List>
 			</>
 		)
-		return (<div/>)
+		return (<div />)
 	}
 	else {
 		return (

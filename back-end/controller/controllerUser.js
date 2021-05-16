@@ -60,7 +60,7 @@ exports.signup = (req, res) => {
                         });
                         token.save()
                         sendMail(user.email, 'Account Verification Link',
-                            'Hello ' + req.body.name + ',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/user\/confirmation\/' + user.email + '\/' + token.token + '\n\nThank You!\n');
+                            'Hello ' + req.body.name + ',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + '127.0.0.1:3000' + '\/user\/confirmation\/' + user.email + '\/' + token.token + '\n\nThank You!\n');
 
 
                         var conn = await amqplib.connect(config.RABBITURL);

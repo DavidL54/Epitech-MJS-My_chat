@@ -1,12 +1,16 @@
+const controllerSocket = require('./controller/controllerSocket');
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const server = require('http').Server(app);
-var amqp = require('amqplib/callback_api');
-const controllerSocket = require('./controller/controllerSocket');
-var logger = require('morgan');
 const config = require('./config');
 const cors = require('cors');
+const server = require('http').Server(app);
+
+var amqp = require('amqplib/callback_api');
+var logger = require('morgan');
+var fs = require("fs");
+
 
 const port = process.env.PORT || 8080;
 const io = require('socket.io')(server, { cors: { origin: '*' } });
@@ -44,10 +48,11 @@ app.get('/', (req, res) => {
     res.json({ "message": "Welcome to DEscord" });
 });
 
-require('./routes/routeUser.js')(app);
-require('./routes/routeRoom.js')(app);
-require('./routes/routeMessage.js')(app);
-require('./routes/routeInvitation.js')(app);
+var routePath = "./routes/";
+fs.readdirSync(routePath).forEach(function (file) {
+    var route = routePath + file;
+    require(route)(app);
+});
 
 server.listen(port, () => {
     console.log("Server is listening on port ", port);

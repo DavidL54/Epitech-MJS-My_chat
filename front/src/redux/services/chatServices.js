@@ -2,8 +2,7 @@ import { apiClient, handleResponse } from "./axios";
 
 export const chatServices = {
     getUserByRoom,
-    postReceivedMessage,
-    getLastMessage,
+    getLastMessageByRoomId,
 };
 
 function getUserByRoom(id) {
@@ -14,16 +13,8 @@ function getUserByRoom(id) {
         })
 }
 
-function postReceivedMessage(body) {
-    return apiClient.post(`/message`, body)
-        .then(handleResponse)
-        .then(data => {
-            return data
-        })
-}
-
-function getLastMessage(body) {
-    return apiClient.get(`/message`)
+function getLastMessageByRoomId(id) {
+    return apiClient.get(`/message/${id}`)
         .then(handleResponse)
         .then(data => {
             return data

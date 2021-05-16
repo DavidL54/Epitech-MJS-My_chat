@@ -3,7 +3,6 @@ const Message = require('../models/modelMessage');
 exports.createMessage = (req, res) => {
     const message = new Message({
         sender: req.body.sender,
-        receiver: req.userData.userId,
         roomid: req.body.roomid,
         message: req.body.message
     });
@@ -18,13 +17,10 @@ exports.createMessage = (req, res) => {
 };
 
 exports.getLastTenMessage = (req, res) => {
-    Message.find({ $and: [{ receiver: req.userData.userId }, { roomid: req.params.roomid}] }).limit(10).lean().exec()
-        .then((error, message) => {
-        if (error) {
-            res.status(400).json(error);
-        }
-        else if (message === null) {
-            res.status(400).send({ error: 'Server was unable to find this invit' });
+    Message.find({ roomid: req.params.roomid }).sort({ created_at: 'desc' }).limit(10).lean().exec()
+        .then((message) => {
+        if (message === null) {
+            res.status(400).send({ error: 'Server was unable to find message' });
         }
         else {
             res.status(200).json(message);
@@ -34,7 +30,7 @@ exports.getLastTenMessage = (req, res) => {
 };
 
 exports.getLastGlobalMessage = (req, res) => {
-    Message.find({ receiver: req.userData.userId }).limit(100).lean().exec()
+    Message.find({ sender: req.userData.userId }).limit(100).lean().exec()
         .then((message) => {
             if (message === null) {
                 res.status(400).send({ error: 'Server was unable to find this invit' });

@@ -12,7 +12,6 @@ import { userServices } from '../../redux/services/userServices';
 import { invitServices } from '../../redux/services/invitServices';
 import { toastError, toastSuccess } from '../../redux/actions/alertActions';
 import AsyncSelect from 'react-select/async';
-import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import jwt_decode from 'jwt-decode';
 
 const useStyles = makeStyles((theme) => ({
@@ -50,7 +49,6 @@ const fieldStyle = { width: "100%", backgroundColor: "white", fontSize: "16px", 
 
 const ModalRoom = (props) => {
   const { modalinvit, setmodalinvit, token } = props;
-  const [response, setresponse] = useState(false);
   const classes = useStyles();
   
   let info;
@@ -59,7 +57,7 @@ const ModalRoom = (props) => {
     console.log(info);
   }
   catch {
-    toastError("invalid token");
+    toastError("Invalid token");
     setmodalinvit(false);
   }
 

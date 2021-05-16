@@ -5,16 +5,20 @@ import {
   List,
   ListItem,
   ListItemText,
+  ListItemIcon
 } from '@material-ui/core';
 import Loader from "react-loader-spinner";
 import { sendMessage } from '../../redux/actions/socketAction'
 import { roomServices } from '../../redux/services/roomServices'
+import MenuOpenIcon from '@material-ui/icons/MenuOpen';
+import ModalRoom from './modalRoomMenu'
 
 
 const Room = (props) => {
   const { selectedRoom, setselectedRoom } = props;
   const [loaded, setLoaded] = useState(true);
   const [room, setroom] = useState([]);
+  const [roomModal, setroomModal] = useState(false);
 
   useEffect(() => {
     roomServices.getAllowRoomByUser(props.user.userId)
@@ -27,18 +31,23 @@ const Room = (props) => {
 
   if (loaded === true) {
     return (
-      <List dense={true}>
-        {room.map(con => {
-          const color = selectedRoom === con._id ? "#bf99db" : "transparent";
-          return (
-            <ListItem button style={{ backgroundColor: color }} onClick={() => changeRoom(con._id)}>
-              <ListItemText
-                primary={con.name}
-              />
-            </ListItem>
-          )
-        })}
-      </List>
+      <>
+        <List dense={true}>
+          {room.map(con => {
+            const color = selectedRoom === con._id ? "#bf99db" : "transparent";
+            return (
+              <ListItem button style={{ backgroundColor: color }}>
+                <ListItemIcon ><MenuOpenIcon onClick={() => { changeRoom(con._id); setroomModal(true); }}/></ListItemIcon>
+                <ListItemText
+                  onClick={() => changeRoom(con._id)}
+                  primary={con.name}
+                />
+              </ListItem>
+            )
+          })}
+        </List>
+        { roomModal ? <ModalRoom roomModal={roomModal} setroomModal={setroomModal} selectedRoom={selectedRoom} /> : <div />}
+      </>
     )
   }
   else {

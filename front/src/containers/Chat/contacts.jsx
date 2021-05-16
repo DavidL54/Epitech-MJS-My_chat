@@ -41,45 +41,47 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Contact = (props) => {
-  const { selectedRoom } = props;
+  const { selectedRoom, contact, setcontact } = props;
 
   const [loaded, setLoaded] = useState(true);
-  const [contact, setcontact] = useState([]);
   const [contactState, setcontactState] = useState({});
   const contactStateKeys = Object.keys(contactState);
-
-  const socket = useContext(SocketContext);
 
   useEffect(() => {
     setcontactState(props.socket.chat);
     if (selectedRoom) {
       chatServices.getUserByRoom(selectedRoom)
         .then(res => {
-          setcontact(res);
+          let formatedContact = {}
+          res.forEach(ct => {
+            formatedContact[ct._id] = { name: `${ct.firstname} ${ct.name}`, id: ct._id };
+          })
+          setcontact(formatedContact);
         });
     }
-  }, [props.socket, selectedRoom])
+  }, [props.socket.chat, selectedRoom])
 
   if (loaded === true) {
+    
+    let returnContact = []
+
+    for (const [key, ct] of Object.entries(contact)) {
+      let color = 'grey';
+      if (contactStateKeys.includes(ct.id)) {
+        if (contactState[ct.id] === 2) color = "green"
+        else if (contactState[ct.id] === 1) color = "yellow"
+      }
+      returnContact.push(
+        <ListItem>
+          <FiberManualRecordIcon style={{ color }} />
+          <ListItemText
+            primary={ct.name}
+          />
+        </ListItem>)
+    }
     return (
       <>
-        <List dense={true}>
-          {contact.map(con => {
-            let color = 'grey';
-            if (contactStateKeys.includes(con._id)) {
-              if (contactState[con._id] === 2) color = "green"
-              else if (contactState[con._id] === 1) color = "yellow"
-            }
-            return (
-              <ListItem>
-                <FiberManualRecordIcon style={{ color }} />
-                <ListItemText
-                  primary={`${con.name} ${con.firstname}`}
-                />
-              </ListItem>)
-          }
-          )}
-        </List>
+        {returnContact}
       </>
     )
   }
