@@ -68,13 +68,13 @@ const Login = props => {
 					if (res.status && res.status == 409) {
 						props.dispatch(change(`recover`, 'email', email));
 						const action = { name: "Recover my password", action: { fonction: setredirectRecover, param: true } };
-						toastError(`Error : ${res.message}`, action);
+						toastError(`${res.message}`, action);
 					}
 					else if (res.statusText && res.statusText === "KO") {
-						toastError(`Error : ${res.message}`);
+						toastError(`${res.message}`);
 					}
 					else {
-						toastSuccess("User created with success. Please check your mailBox");
+						toastSuccess("A confirmation email has been sent.Please click on the link in it to confirm your account");
 						setredirectlogin(true);
 					}
 				});
@@ -92,56 +92,46 @@ const Login = props => {
 		<div id="login" className="App">
 			<div className="login-container">
 				<h1 className="title">D.E.scord</h1>
-				<p>Inscription</p>
+				<p>SignUp</p>
 				<ValidatorForm
 					onSubmit={connectme}
 					onError={errors => console.log(errors)}
 				>
-					<Box display="flex" justifyContent="flex-start" m={1} p={1}>
-						<Box p={1}><Typography style={{ }} variant="h6" gutterBottom>Email</Typography></Box>
-						<Box p={1}>
-							<TextValidator
-							name="email"
-							onChange={(e, val) => setemail(e.target.value)}
-							style={fieldStyle}
-							placeholder="Email"
-							type="email"
-							value={email}
-							validators={['required']}
-							errorMessages={['The email is required']}
-							/>
-						</Box>
-					</Box>
-					<Box display="flex" justifyContent="flex-start" m={1} p={1}>
-						<Box p={1}><Typography align="left" style={{ }} variant="h6" gutterBottom>Nom</Typography></Box>
-						<Box p={1}>
-							<TextValidator
-								name="name"
-								onChange={(e, val) => setname(e.target.value)}
-								style={fieldStyle}
-								placeholder="Nom"
-								type="text"
-								value={name}
-								validators={['required']}
-								errorMessages={['The name is required']}
-							/>
-						</Box>
-					</Box>
-					<Box display="flex" justifyContent="flex-end" m={1} p={1}>
-						<Box p={1}><Typography align="left" style={{ }} variant="h6" gutterBottom>Prenom</Typography></Box>
-						<Box p={1}>
-							<TextValidator
-								name="firstname"
-								onChange={(e, val) => setfirstname(e.target.value)}
-								style={fieldStyle}
-								placeholder="Firstname"
-								validators={['required']}
-								value={firstname}
-								errorMessages={['The firstname is required']}
-							/>
-						</Box>
-					</Box>
-					<Typography align="left" style={{marginLeft: "50px"}} variant="h6" gutterBottom>Email</Typography>
+					<Typography align="left" style={{ marginLeft: "50px" }} variant="h6" gutterBottom>Email</Typography>
+					<TextValidator
+						name="email"
+						onChange={(e, val) => setemail(e.target.value)}
+						style={fieldStyle}
+						placeholder="Email"
+						type="email"
+						value={email}
+						validators={['required']}
+						errorMessages={['The email is required']}
+					/>
+					<Typography align="left" style={{ marginLeft: "50px" }} variant="h6" gutterBottom>Name</Typography>
+					<TextValidator
+						name="name"
+						onChange={(e, val) => setname(e.target.value)}
+						style={fieldStyle}
+						placeholder="Name"
+						type="text"
+						value={name}
+						validators={['required']}
+						errorMessages={['The name is required']}
+					/>
+
+					<Typography align="left" style={{ marginLeft: "50px" }} variant="h6" gutterBottom>Firstname</Typography>
+					<TextValidator
+						name="firstname"
+						onChange={(e, val) => setfirstname(e.target.value)}
+						style={fieldStyle}
+						placeholder="Firstname"
+						validators={['required']}
+						value={firstname}
+						errorMessages={['The firstname is required']}
+					/>
+
+					<Typography align="left" style={{ marginLeft: "50px" }} variant="h6" gutterBottom>Age</Typography>
 					<TextField
 						name="age"
 						type="number"
@@ -152,6 +142,7 @@ const Login = props => {
 						validators={['required']}
 						errorMessages={['The age is required']}
 					/>
+					<Typography align="left" style={{ marginLeft: "50px" }} variant="h6" gutterBottom>Username</Typography>
 					<TextValidator
 						name="username"
 						onChange={(e, val) => setusername(e.target.value)}
@@ -161,12 +152,13 @@ const Login = props => {
 						validators={['required']}
 						errorMessages={['The username is required']}
 					/>
+					<Typography align="left" style={{ marginLeft: "50px" }} variant="h6" gutterBottom>Password</Typography>
 					<TextValidator
 						name="password"
 						type="password"
 						style={fieldStyle}
 						onChange={(e, val) => setPassword(e.target.value)}
-						placeholder="mot de passe"
+						placeholder="password"
 						value={password}
 						validators={['required']}
 						errorMessages={['The password is required']}
@@ -176,11 +168,11 @@ const Login = props => {
 						variant="contained"
 						className="connect"
 						color="primary">
-						S'Inscrire
+						SignUp
 						</Button>
 				</ValidatorForm>
 				<div style={{ marginTop: "10px", cursor: 'pointer' }}>
-					<Link onClick={() => setredirectlogin(true)}>Revenir au Login</Link>
+					<Link onClick={() => setredirectlogin(true)}>Come back to Login</Link>
 				</div>
 			</div>
 		</div>

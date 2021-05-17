@@ -30,13 +30,16 @@ function login(body, setredirectRecover) {
 						localStorage.setItem('user', decoded)
 						dispatch(loginSuccess({ loggedIn: true, jwt: logged.token }))
 						dispatch(dispatchUser(decoded));
-						toastSuccess('Connexion réussie');
+						toastSuccess('You have been authenticated');
 					}
-					else if (logged.status == 401) {
+					else if (logged.status == 401 || logged.status == 404) {
 						const parsedBody = JSON.parse(body);
 						dispatch(change(`recover`, 'email', parsedBody.username));
 						const action = { name: "Recover my password", action: { fonction: setredirectRecover, param: true } };
 						toastError(logged.message, action);
+					}
+					else if (logged.status == 409) {
+						toastError(logged.message);
 					}
 					else {
 						toastError(logged.message);
