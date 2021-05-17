@@ -213,5 +213,9 @@ describe("Room routes", () => {
         })
 
     })
+
+    describe('Get Room by user', () => {
+
+    })
 });
 
