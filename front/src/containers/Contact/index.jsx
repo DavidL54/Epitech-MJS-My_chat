@@ -16,14 +16,15 @@ import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import { Loading } from '../../helpers/utils'
-import ModalRoom from './modalRoom';
-import ModalInvitation from './modalInvitation';
 import { roomServices } from '../../redux/services/roomServices';
 import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 import { toastSuccess } from "../../redux/actions/alertActions";
 import { useParams } from "react-router-dom";
-import { SocketContext, socket } from '../App/SocketComponent';
+import ModalRoomEdit from './modalRoomEdit';
+import ModalRoom from './modalRoom';
+import ModalInvitation from './modalInvitation';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -45,8 +46,10 @@ const useStyles = makeStyles((theme) => ({
 const Contact = (props) => {
 	const [loaded, setLoaded] = useState(true);
 	const [modalRoom, setmodalRoom] = useState(false);
-	const [modalinvit, setmodalinvit] = useState(false );
+	const [modalinvit, setmodalinvit] = useState(false);
+	const [modalRoomEdit, setmodalRoomEdit] = useState(false);
 	const [myRoom, setmyRoom] = useState([]);
+	const [selectedRoom, setselectedRoom] = useState("");
 	const { invitation, token } = useParams();
 
 	const classes = useStyles();
@@ -65,6 +68,11 @@ const Contact = (props) => {
 				setmyRoom(myRoom.filter(item => item._id !== idroom));
 				toastSuccess('Room deleted with success');
 			})
+	}
+
+	const editRoom = (idroom) => {
+		setselectedRoom(idroom);
+		setmodalRoomEdit(true);
 	}
 
 	if (loaded === true) {
@@ -96,15 +104,13 @@ const Contact = (props) => {
 										<List dense={true}>
 											{myRoom.map((elem) => (
 												<ListItem>
-													<ListItemAvatar>
-														<Avatar>
-															<FolderIcon />
-														</Avatar>
-													</ListItemAvatar>
 													<ListItemText
 														primary={elem.name}
 													/>
 													<ListItemSecondaryAction>
+														<IconButton edge="end" aria-label="delete" onClick={() => editRoom(elem._id)}>
+															<EditIcon />
+														</IconButton>
 														<IconButton edge="end" aria-label="delete" onClick={() => deleteRoom(elem._id)}>
 															<DeleteIcon />
 														</IconButton>
@@ -120,6 +126,7 @@ const Contact = (props) => {
 				</div>
 				{ modalRoom ? <ModalRoom modalRoom={modalRoom} setmodalRoom={setmodalRoom} myRoom={myRoom} setmyRoom={setmyRoom} /> : <div />}
 				{ modalinvit ? <ModalInvitation modalinvit={modalinvit} setmodalinvit={setmodalinvit} token={token} /> : <div />}
+				{ modalRoomEdit ? <ModalRoomEdit roomModal={modalRoomEdit} setroomModal={setmodalRoomEdit} selectedRoom={selectedRoom} /> : <div />}
 			</div>
 
 		)

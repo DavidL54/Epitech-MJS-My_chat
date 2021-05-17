@@ -24,7 +24,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import ContactPhoneIcon from '@material-ui/icons/ContactPhone';
 import PersonIcon from '@material-ui/icons/Person';
 import { sidebarActions } from '../../redux/actions/sidebarActions'
-import { loadReceivedMessage, chatHandler, Initmessage } from '../../redux/actions/socketAction'
+import { loadReceivedMessage, chatHandler, tappingHandler } from '../../redux/actions/socketAction'
 import { NavLink } from 'react-router-dom'
 import { SocketContext } from '../App/SocketComponent';
 import { auth } from '../../helpers/authHeader'
@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
 	appBar: {
 		zIndex: theme.zIndex.drawer + 1,
 		color: "white",
-		backgroundColor: "#7909c4",
+		backgroundColor: "#0069B4",
 		transition: theme.transitions.create(['width', 'margin'], {
 			easing: theme.transitions.easing.sharp,
 			duration: theme.transitions.duration.leavingScreen,
@@ -52,15 +52,6 @@ const useStyles = makeStyles((theme) => ({
 			easing: theme.transitions.easing.sharp,
 			duration: theme.transitions.duration.enteringScreen,
 		}),
-	},
-
-	BottomBar: {
-		top: 'auto',
-		color: "white",
-		height: 100,
-		backgroundColor: "#282828",
-		bottom: 0,
-		zIndex: theme.zIndex.drawer + 1,
 	},
 
 	menuButton: {
@@ -76,14 +67,14 @@ const useStyles = makeStyles((theme) => ({
 	},
 	drawerOpen: {
 		width: drawerWidth,
-		backgroundColor: "#7909c4",
+		backgroundColor: "#0069B4",
 		transition: theme.transitions.create('width', {
 			easing: theme.transitions.easing.sharp,
 			duration: theme.transitions.duration.enteringScreen,
 		}),
 	},
 	drawerClose: {
-		backgroundColor: "#7909c4",
+		backgroundColor: "#0069B4",
 		transition: theme.transitions.create('width', {
 			easing: theme.transitions.easing.sharp,
 			duration: theme.transitions.duration.leavingScreen,
@@ -186,9 +177,9 @@ const Layout = (props) => {
 			socket.emit('connected', true);
 			const token = auth.getAccessToken();
 			socket.emit('authentificate', token);
-			props.Initmessage();
 			props.loadReceivedMessage(socket);
 			props.chatHandler(socket);
+			props.tappingHandler(socket);
 		}
 		return () => {
 			socket.emit('connected', false);
@@ -271,10 +262,6 @@ const Layout = (props) => {
 						<ListItemIcon className={classes.itemToolBar}><ContactPhoneIcon /></ListItemIcon>
 						<ListItemText primary={"Contact"} />
 					</ListItem>
-					<ListItem button key={"account"} component={NavLink} to="/admin">
-						<ListItemIcon className={classes.itemToolBar}><PersonIcon /></ListItemIcon>
-						<ListItemText primary={"Compte"} />
-					</ListItem>
 					<ListItem onClick={logout} button key={"exit"}>
 						<ListItemIcon className={classes.itemToolBar}><ExitToAppIcon/></ListItemIcon>
 						<ListItemText primary={"Se deconnecter"}/>
@@ -297,7 +284,7 @@ const actionCreators = {
 	setSidebarState: sidebarActions.setSidebarState,
 	loadReceivedMessage,
 	chatHandler,
-	Initmessage
+	tappingHandler
 }
 
 const connectedLayout = connect(mapStateToProps, actionCreators)(Layout)

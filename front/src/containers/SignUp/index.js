@@ -9,11 +9,13 @@ import {
 	Button,
 	Link
 } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
 import { userActions } from '../../redux/actions/userActions';
 import { userServices } from '../../redux/services/userServices';
 import { Redirect } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import { toastError, toastSuccess } from '../../redux/actions/alertActions';
 
@@ -27,16 +29,16 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-const fieldStyle = { width: "30ch", backgroundColor: "white", padding: "15px", margin: "15px", fontSize: "16px", borderRadius: "10px" };
+const fieldStyle = { width: "30ch", backgroundColor: "white", padding: "15px", margin: "0 15px 15px 15px", fontSize: "16px", borderRadius: "10px" };
 
 const Login = props => {
 	const classes = useStyles();
 	const [email, setemail] = useState("");
 	const [age, setage] = useState(20);
-	const [password, setPassword] = useState("e");
-	const [username, setusername] = useState("e");
-	const [firstname, setfirstname] = useState("e");
-	const [name, setname] = useState("e");
+	const [password, setPassword] = useState("");
+	const [username, setusername] = useState("");
+	const [firstname, setfirstname] = useState("");
+	const [name, setname] = useState("");
 	const [redirectRecover, setredirectRecover] = useState(false);
 	const [redirectlogin, setredirectlogin] = useState(false);
 
@@ -66,13 +68,13 @@ const Login = props => {
 					if (res.status && res.status == 409) {
 						props.dispatch(change(`recover`, 'email', email));
 						const action = { name: "Recover my password", action: { fonction: setredirectRecover, param: true } };
-						toastError(`Error : ${res.message}`, action);
+						toastError(`${res.message}`, action);
 					}
 					else if (res.statusText && res.statusText === "KO") {
-						toastError(`Error : ${res.message}`);
+						toastError(`${res.message}`);
 					}
 					else {
-						toastSuccess("User created with success. Please check your mailBox");
+						toastSuccess("A confirmation email has been sent.Please click on the link in it to confirm your account");
 						setredirectlogin(true);
 					}
 				});
@@ -90,11 +92,12 @@ const Login = props => {
 		<div id="login" className="App">
 			<div className="login-container">
 				<h1 className="title">D.E.scord</h1>
-				<p>Inscription</p>
+				<p>SignUp</p>
 				<ValidatorForm
 					onSubmit={connectme}
 					onError={errors => console.log(errors)}
 				>
+					<Typography align="left" style={{ marginLeft: "50px" }} variant="h6" gutterBottom>Email</Typography>
 					<TextValidator
 						name="email"
 						onChange={(e, val) => setemail(e.target.value)}
@@ -105,16 +108,19 @@ const Login = props => {
 						validators={['required']}
 						errorMessages={['The email is required']}
 					/>
+					<Typography align="left" style={{ marginLeft: "50px" }} variant="h6" gutterBottom>Name</Typography>
 					<TextValidator
 						name="name"
 						onChange={(e, val) => setname(e.target.value)}
 						style={fieldStyle}
-						placeholder="Nom"
+						placeholder="Name"
 						type="text"
 						value={name}
 						validators={['required']}
 						errorMessages={['The name is required']}
 					/>
+
+					<Typography align="left" style={{ marginLeft: "50px" }} variant="h6" gutterBottom>Firstname</Typography>
 					<TextValidator
 						name="firstname"
 						onChange={(e, val) => setfirstname(e.target.value)}
@@ -124,6 +130,8 @@ const Login = props => {
 						value={firstname}
 						errorMessages={['The firstname is required']}
 					/>
+
+					<Typography align="left" style={{ marginLeft: "50px" }} variant="h6" gutterBottom>Age</Typography>
 					<TextField
 						name="age"
 						type="number"
@@ -134,6 +142,7 @@ const Login = props => {
 						validators={['required']}
 						errorMessages={['The age is required']}
 					/>
+					<Typography align="left" style={{ marginLeft: "50px" }} variant="h6" gutterBottom>Username</Typography>
 					<TextValidator
 						name="username"
 						onChange={(e, val) => setusername(e.target.value)}
@@ -143,12 +152,13 @@ const Login = props => {
 						validators={['required']}
 						errorMessages={['The username is required']}
 					/>
+					<Typography align="left" style={{ marginLeft: "50px" }} variant="h6" gutterBottom>Password</Typography>
 					<TextValidator
 						name="password"
 						type="password"
 						style={fieldStyle}
 						onChange={(e, val) => setPassword(e.target.value)}
-						placeholder="mot de passe"
+						placeholder="password"
 						value={password}
 						validators={['required']}
 						errorMessages={['The password is required']}
@@ -158,11 +168,11 @@ const Login = props => {
 						variant="contained"
 						className="connect"
 						color="primary">
-						S'Inscrire
+						SignUp
 						</Button>
 				</ValidatorForm>
 				<div style={{ marginTop: "10px", cursor: 'pointer' }}>
-					<Link onClick={() => setredirectlogin(true)}>Revenir au Login</Link>
+					<Link onClick={() => setredirectlogin(true)}>Come back to Login</Link>
 				</div>
 			</div>
 		</div>

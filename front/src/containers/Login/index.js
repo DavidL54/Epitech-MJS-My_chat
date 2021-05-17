@@ -67,7 +67,7 @@ const Login = props => {
 			<div id="login" className="App">
 				<div className="login-container">
 					<h1 className="title">D.E.scord</h1>
-					<p>Veuillez vous connecter pour acceder au chat</p>
+					<p>Please login to access on chat</p>
 
 						<ValidatorForm
 							onSubmit={connectme}
@@ -77,18 +77,18 @@ const Login = props => {
 								name="email"
 							onChange={(e, val) => changeusername(e)}
 								style={fieldStyle}
-								placeholder="Email"
+							placeholder="Email ou Username"
 								type="text"
 								value={username}
 								validators={['required']}
-								errorMessages={['The email is required']}
+								errorMessages={['The email or username is required']}
 							/>
 							<TextValidator
 								name="password"
 								type="password"
 								style={fieldStyle}
 								onChange={(e, val) => setPassword(e.target.value)}
-								placeholder="mot de passe"
+								placeholder="password"
 								value={password}
 								validators={['required']}
 								errorMessages={['The password is required']}
@@ -98,11 +98,14 @@ const Login = props => {
 								variant="contained"
 								className="connect"
 								color="primary">
-								Se connecter
+								Login
 						</Button>
 						</ValidatorForm>
-					<div style={{ marginTop: "10px", cursor: 'pointer' }}>
-						Pas encore inscrit ? : <Link onClick={() => setredirectSignup(true)}>S'inscrire</Link>
+					<div style={{ marginTop: "10px" }}>
+						Not registered? : <Link style={{ cursor: 'pointer' }} onClick={() => setredirectSignup(true)}>Sign up</Link>
+					</div>
+					<div style={{ marginTop: "10px" }}>
+						Lost Password? : <Link style={{ cursor: 'pointer' }} onClick={() => setredirectRecover(true)}>Recover my password</Link>
 					</div>
 				</div>
 			</div>

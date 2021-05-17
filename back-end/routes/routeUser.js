@@ -9,16 +9,16 @@ module.exports = (app) => {
         .post(controllerUser.signup);
     app.route('/user/login')
         .post(controllerUser.login);
-    app.route('/user/confirmation/:email/:token')
-        .get(controllerUser.confirmEmailToken);
     app.route('/user/newlink')
         .get(controllerUser.generateLink);
     app.route('/user/:userId')
         .delete(checkAuth, controllerUser.deleteUser);
+    app.route('/user/room/:id')
+        .get(controllerUser.getUserByRoom);
     app.route('/user/forgotpassword')
         .put(controllerUser.forgotpass);
     app.route('/user/resetpassword/:token')
         .post(controllerUser.resetPass);
-    app.route('/user/room/:id')
-        .get(controllerUser.getUserByRoom);
+    app.route('/user/confirmation/:email/:token')
+        .get(controllerUser.confirmEmailToken);
 }

@@ -2,52 +2,62 @@ import React, { useEffect, useState, useContext } from "react";
 import { connect } from 'react-redux';
 import "../../scss/Home.scss";
 import {
-	TextField,
 	Button,
-	List,
-	ListItem,
-	ListItemText,
 	Grid
 } from '@material-ui/core';
 import Loader from "react-loader-spinner";
 import { SocketContext } from '../App/SocketComponent';
-import { sendMessage } from '../../redux/actions/socketAction'
 import { makeStyles } from '@material-ui/core/styles';
-import Room from './room';
+import Room from './roomComponent';
 import Contact from './contacts';
-import Message from './messages';
+import Message from './messagesComponent';
+import Tapping from './tappingComponent'
+import MessageField from './messageField'
 
 const useStyles = makeStyles((theme) => ({
 	item: {
+		backgroundColor: "#bbb7bc",
+		color: "black",
+		minHeight: "80vh",
+		padding: "20px",
+		borderRadius: "10px"
+	},
+	itemMessage: {
 		backgroundColor: "#cecece",
 		color: "black",
-		border: "1px black solid",
-		margin: '15px',
-		padding: '20px',
 		minHeight: "80vh",
+		padding: "20px",
+		borderRadius: "10px"
 	},
 	textarea: {
 		backgroundColor: "#cecece",
 		color: "black",
-		border: "1px black solid",
-		margin: '15px',
-		padding: '20px',
 		minHeight: "10vh",
+		padding: "20px"
 	},
 	sendbutton: {
 		backgroundColor: "#cecece",
 		color: "black",
-		border: "1px black solid",
-		margin: '15px',
-		padding: '20px',
 		minHeight: "10vh",
+		minWidth: "50px",
+		paddingTop: "30px"
 	},
+	sendbox: {
+		marginTop: '10px',
+		borderRadius: "10px"
+	},
+	tapping: {
+		width: "200px"
+	},
+	message: {
+		height: "90%"
+	}
 }));
 
 const Chat = (props) => {
 	const [loaded, setLoaded] = useState(true);
-	const [message, setmessage] = useState("");
 	const [selectedRoom, setselectedRoom] = useState("");
+	const [contact, setcontact] = useState([]);
 	const socket = useContext(SocketContext);
 	const classes = useStyles();
 
@@ -56,38 +66,29 @@ const Chat = (props) => {
 		return () => socket.emit("connected", 1);
 	}, [])
 
-	const send = () => {
-		if (props.user.userId) {
-			props.sendMessage(socket, selectedRoom, message)
-			setmessage('');
-		}
-	}
-
 	if (loaded === true) {
 		return (
 			<>
-				<Grid style={{ height: "auto", width: "auto" }} container spacing={3}>
+				<Grid style={{ height: "auto", width: "100%" }} className={classes.sendbox} container>
 					<Grid className={classes.item} item xs={2}>
 						<h3>Contacts</h3>
-						<Contact selectedRoom={selectedRoom} />
+						<Contact contact={contact} setcontact={setcontact} selectedRoom={selectedRoom} />
 					</Grid>
-					<Grid className={classes.item} item xs={7}>
+					<Grid className={classes.itemMessage} item xs={8}>
 						<h3>Messages</h3>
-						<Message selectedRoom={selectedRoom} />
+						<div className={classes.message}>
+							<Message className={classes.message} contact={contact} selectedRoom={selectedRoom} />
+						</div>
+						<div className={classes.tapping} >
+							<Tapping contact={contact} className={classes.tapping} />
+						</div>
 					</Grid>
 					<Grid className={classes.item} item xs={2}>
 						<h3>Rooms</h3>
 						<Room selectedRoom={selectedRoom} setselectedRoom={setselectedRoom} />
 					</Grid>
 				</Grid>
-				<Grid style={{ height: "auto", width: "auto" }} container spacing={3}>
-					<Grid className={classes.textarea} item xs={8}>
-						<TextField style={{ backgroundColor: "white", color: "black", width: "100%" }} value={message} onChange={(e) => setmessage(e.target.value)} variant="outlined" />
-					</Grid>
-					<Grid className={classes.sendbutton} item xs={3}>
-						<Button disabled={selectedRoom ? false : true} onClick={send} color='primary'>Envoyer</Button>
-					</Grid>
-				</Grid>
+				<MessageField selectedRoom={selectedRoom} />
 			</>
 		)
 	}
@@ -106,8 +107,4 @@ function mapStateToProps(state) {
 	return { user, socket }
 }
 
-const actionCreators = {
-	sendMessage
-}
-
-export default connect(mapStateToProps, actionCreators)(Chat);
+export default connect(mapStateToProps, {})(Chat);

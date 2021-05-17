@@ -6,11 +6,20 @@ export const roomServices = {
     createRoom,
     deleteRoom,
     getRoomByUser,
-    getAllowRoomByUser
+    getAllowRoomByUser,
+    updateRoom
 };
 
 function createRoom(body) {
     return apiClient.post(`/room`, body)
+        .then(handleResponse)
+        .then(data => {
+            return data
+        })
+}
+
+function updateRoom(id, body) {
+    return apiClient.put(`/room/${id}`, body)
         .then(handleResponse)
         .then(data => {
             return data

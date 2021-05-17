@@ -27,109 +27,134 @@ const useStyles = makeStyles((theme) => ({
 const fieldStyle = { width: "25ch", backgroundColor: "white", padding: "15px", margin: "15px", fontSize: "16px", borderRadius: "10px" };
 
 const Recover = props => {
+  const { form, confirmandlogin } = props;
   const [redirect, setredirect] = useState(false);
+  const [redirectcontact, setredirectcontact] = useState(false);
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
+  const [repeatPassword, setrepeatPassword] = useState("");
 
-  const { token } = useParams();
+  const { token, id  } = useParams();
 
-  useEffect(() => {
-    const form = props.form;
-    if (form && form.values && form.values.email) {
-      setemail(form.values.email);
-    }
-  }, []);
+  if (token) {
+    ValidatorForm.addValidationRule('isPasswordMatch', (value) => {
+      if (value !== password) {
+        return false;
+      }
+      return true;
+    });
+  }
 
-  const recoverme = () => {
-    userServices.recover(JSON.stringify({ username: email }))
-      .then(res => {
+  if (token && id) {
+    userServices.confirmaccount(id, token)
+      .then((res) => {
         console.log(res);
+        if (res.statusText && res.statusText === "KO") {
+          setredirect(true);
+          toastError(res.message)
+        }
+        else if (!res.token) {
+          setredirect(true);
+          toastSuccess(res);
+        }
+        else {
+          confirmandlogin(res, setredirectcontact);
+        }
       })
   }
 
+  useEffect(() => {
+    if (form && form.values && form.values.email) {
+      setemail(form.values.email);
+    }
+  }, [])
+  
+ 
+  const recoverme = () => {
+      userServices.recover(JSON.stringify({ username: email }))
+        .then(res => {
+          if (res.statusText && res.statusText === "KO") {
+            setredirect(true);
+            toastSuccess(res.message);
+          }
+          else {
+            setredirect(true);
+            toastSuccess(res);
+          }
+        })
+  }
+
   const changepassword = () => {
-    userServices.resetpasswordCallback(token, JSON.stringify({ newpass: password }))
-      .then(res => {
-        if (res.statusText && res.statusText === "KO") {
+    if (password && repeatPassword && password === repeatPassword) {
+      userServices.resetpasswordCallback(token, JSON.stringify({ newpass: password }))
+        .then(res => {
+          console.log(res);
+          if (res.statusText && res.statusText === "KO") {
             toastError(`Error : ${res.message}`);
-        }
-        else {
-          setredirect(true);
-          toastSuccess('password changed with success');
-        }
-      })
+          }
+          else {
+            confirmandlogin(res, setredirectcontact);
+          }
+        })
+    }
   }
 
   if (redirect) {
     return <Redirect push to="/login" />;
   }
-  else if (token) {
+  else if (redirectcontact) {
+    return <Redirect push to="/contact" />;
+  }
+  else if (token && id ) {
+    return (<div id="login" className="App">
+      <div className="login-container">
+
+        You will redirect...
+      </div>
+    </div>)
+  }
+  else {
     return (<div id="login" className="App">
       <div className="login-container">
         <h1 className="title">D.E.scord</h1>
-        <p>Nouveau mot de passe</p>
+        <p>{token ? "Set new password": "Send recover link"}</p>
         <ValidatorForm
-          onSubmit={changepassword}
+          onSubmit={token ? changepassword : recoverme}
           onError={errors => console.log(errors)}
         >
           <TextValidator
-            name="email"
-            onChange={(e, val) => setpassword(e.target.value)}
+            name={token ? "password" : "email"}
+            onChange={(e) => { token ? setpassword(e.target.value) : setemail(e.target.value) } }
             style={fieldStyle}
-            placeholder="New Password"
-            type="password"
-            value={password}
+            placeholder={token ? "New Password" : "Email"}
+            type={token ? "password" : "email"}
+            value={token ? password : email}
             validators={['required']}
-            errorMessages={['The password is required']}
+            errorMessages={[`The ${token ? "password" : "email"} is required`]}
           />
+          {token ? <TextValidator
+            onChange={(e) => setrepeatPassword(e.target.value)}
+            name="repeatPassword"
+            type="password"
+            style={fieldStyle}
+            validators={['isPasswordMatch', 'required']}
+            placeholder="Repeat Password"
+            errorMessages={['Password mismatch', 'The repeat password is required']}
+            value={repeatPassword}
+          /> : <div />}
           <Button
             type="submit"
             variant="contained"
             className="connect"
             color="primary">
-            Change password
+            {token ? "Change password" : "Send me a recover link"}
 						</Button>
         </ValidatorForm>
         <div style={{ marginTop: "10px", cursor: 'pointer' }}>
-          <Link onClick={() => setredirect(true)}>Revenir au login</Link>
+          <Link onClick={() => setredirect(true)}>Come back to login</Link>
         </div>
       </div>
     </div>)
-  }
-  else {
-    return (
-      <div id="login" className="App">
-        <div className="login-container">
-          <h1 className="title">D.E.scord</h1>
-          <p>Recuperation de mot de passe</p>
-          <ValidatorForm
-            onSubmit={recoverme}
-            onError={errors => console.log(errors)}
-          >
-            <TextValidator
-              name="email"
-              onChange={(e, val) => setemail(e.target.value)}
-              style={fieldStyle}
-              placeholder="Email"
-              type="text"
-              value={email}
-              validators={['required']}
-              errorMessages={['The email is required']}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              className="connect"
-              color="primary">
-              Send me a recover link
-						</Button>
-          </ValidatorForm>
-          <div style={{ marginTop: "10px", cursor: 'pointer' }}>
-            <Link onClick={() => setredirect(true)}>Revenir au login</Link>
-          </div>
-        </div>
-      </div>
-    );
   }
 }
 
@@ -140,7 +165,8 @@ function mapState(state) {
 
 const actionCreators = {
   login: userActions.login,
-  logout: userActions.logout
+  logout: userActions.logout,
+  confirmandlogin: userActions.confirmandlogin
 };
 
 const connectedLogin = connect(mapState, actionCreators)(Recover);

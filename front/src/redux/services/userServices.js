@@ -9,7 +9,8 @@ export const userServices = {
     generateLoginToken,
     recover,
     resetpasswordCallback,
-    getAll
+    getAll,
+    confirmaccount
 };
 
 function generateLoginToken(auth) {
@@ -24,6 +25,14 @@ function generateLoginToken(auth) {
 
 function login(body) {
     return apiClient.post(`/user/login`, body)
+        .then(handleResponse)
+        .then(data => {
+            return data
+        })
+}
+
+function confirmaccount(email, token) {
+    return apiClient.get(`/user/confirmation/${email}/${token}`)
         .then(handleResponse)
         .then(data => {
             return data
