@@ -61,7 +61,7 @@ describe("User routes", () => {
             const res = await request.post('/user/signup')
                 .send(userTemplate)
             expect(res.status).toEqual(201)
-            expect(res.body).toEqual({message: 'User created'})
+            expect(res.body).toEqual({message: 'A confirmation email has been sent.Please click on the link in it to confirm your account'})
 
             done()
         })
@@ -69,13 +69,13 @@ describe("User routes", () => {
             const res = await request.post('/user/signup')
                 .send(userTemplate)
             expect(res.status).toEqual(201)
-            expect(res.body).toEqual({message: 'User created'})
+            expect(res.body).toEqual({message: 'A confirmation email has been sent.Please click on the link in it to confirm your account'})
 
             const resFake = await request.post('/user/signup')
                 .send(userTemplate)
 
             expect(resFake.status).toEqual(409)
-            expect(resFake.body).toEqual("Mail exists")
+            expect(resFake.body).toEqual("It seems this account already exists. Do you want to recover your password ?")
 
             done()
         })
@@ -84,14 +84,14 @@ describe("User routes", () => {
             const res = await request.post('/user/signup')
                 .send(userTemplate)
             expect(res.status).toEqual(201)
-            expect(res.body).toEqual({message: 'User created'})
+            expect(res.body).toEqual({message: 'A confirmation email has been sent.Please click on the link in it to confirm your account'})
             userTemplate.email = "test@gmail.com"
 
             const resFake = await request.post('/user/signup')
                 .send(userTemplate)
 
             expect(resFake.status).toEqual(409)
-            expect(resFake.body).toEqual("Username exists")
+            expect(resFake.body).toEqual("It seems this account already exists. Do you want to recover your password ?")
 
             done()
         })
@@ -117,14 +117,14 @@ describe("User routes", () => {
             const res = await createUser(loginTemplate, userTemplate)
 
             expect(res.status).toEqual(401)
-            expect(res.body).toEqual("Wrong Password")
+            expect(res.body).toEqual("The credential you provided do not match.Do you want to recover your password")
             done()
         })
         it('Sign Up user doesn t exist', async done => {
             const res = await createUser({username: "paperer43545"}, userTemplate)
 
             expect(res.status).toEqual(404)
-            expect(res.body).toEqual("User doesn\'t exist")
+            expect(res.body).toEqual("The credential you provided do not match.Do you want to recover your password")
             done()
         })
     });
@@ -217,18 +217,31 @@ describe("Room routes", () => {
     describe('Get Room by user', () => {
         it( 'get Room', async done => {
             const create = await createRoom((templates.loginTemplate))
-            const findRoomBefore = await Room.find({})
-
-            expect(findRoomBefore.length).toEqual(1)
-
-            const deleteRoom = await request.delete(`/room/${create.room.body._id}`)
+            const getRoom = await request.get(`/room/user/${create.decoded.userId}`)
                 .set('authorization', `Bearer ${create.token}`)
-            const findRoomAfter = await Room.find({})
 
-            expect(deleteRoom.status).toEqual(200)
-            expect(findRoomAfter.length).toEqual(0)
+            console.log(create.decoded.userId, getRoom.body[0]._id)
+            // expect(create.decode.userId).toEqual(getRoom.body[0]._id)
+            // answers quentin
+            // expect(create.decoded.userId).toEqual(400)
+
             done()
         })
+        it( 'getallow  Room', async done => {
+            const create = await createRoom((templates.loginTemplate))
+            const getRoom = await request.get(`/room/allow/user/${create.decoded.userId}`)
+                .set('authorization', `Bearer ${create.token}`)
+
+            console.log(create.room.body._id, getRoom.body[0]._id)
+            const tmp = create.room.body._id
+            // expect(tmp).toEqual("test")
+            // expect(create.decode.userId).toEqual(getRoom.body[0]._id)
+            // answers quentin
+            // expect(create.decoded.userId).toEqual(400)
+
+            done()
+        })
+
     })
 });
 

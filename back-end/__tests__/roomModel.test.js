@@ -32,9 +32,11 @@ describe("test", () => {
         expect(Room).toBeDefined();
     })
     describe("Room testing", () => {
+        const userTemplate = templates.userTemplate
+        const roomTemplate = templates.roomTemplate
+
         it('gets a room', async () => {
-            const roomTemplate = templates.userTemplate
-            const user = new User(roomTemplate)
+            const user = new User(userTemplate)
             await user.save();
 
 
@@ -51,28 +53,29 @@ describe("test", () => {
             expect(actual).toEqual(excepted)
             //
         })
-        // it("save a room", async () => {
-        //     const room = new Room(roomTemplate)
-        //     const userSaved = await room.save()
-        //
-        //     const excepted = 'papa'
-        //     const actual = userSaved.firstname
-        //
-        //     expect(actual).toEqual(excepted)
-        //
-        // })
-        // it('update a room', async () => {
-        //     const room = new Room(roomfTemplate)
-        //     await room.save()
-        //
-        //     room.name = "david"
-        //
-        //     const updateRoom = await room.save()
-        //
-        //     const excepted = "david"
-        //     const actual = updateRoom.name
-        //     expect(actual).toEqual(excepted)
-        // })
+        it("save a room", async () => {
+            const room = new Room(roomTemplate)
+            const roomSaved = await room.save()
+
+            // console.log(roomSaved)
+            const excepted = 'elian'
+            const actual = roomSaved.name
+
+            expect(actual).toEqual(excepted)
+
+        })
+        it('update a room', async () => {
+            const room = new Room(roomTemplate)
+            await room.save()
+
+            room.name = "david"
+
+            const updateRoom = await room.save()
+
+            const excepted = "david"
+            const actual = updateRoom.name
+            expect(actual).toEqual(excepted)
+        })
     })
 });
 

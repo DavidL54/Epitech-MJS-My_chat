@@ -236,19 +236,6 @@ exports.forgotpass = (req, res) => {
                     }
                 });
             }
-<<<<<<< HEAD
-            const token = jwt.sign({_id: user[0]._id}, config.JWT_KEY_RESET, {expiresIn: "20m"})
-            user[0].updateOne({resetLink: token}, (err, succes) => {
-                if (err) {
-                    return res.status(400).json('reset password link error')
-                } else {
-                    sendMail(user[0].email, 'Reset Password Link',
-                        'Hello ' + req.body.name + ',\n\n' + 'Please click on given link to reset your password: \nhttp:\/\/' + '127.0.0.1:3000' + '\/user\/resetpassword\/' + token + '\n\nThank You!\n')
-                    return res.status(200).send('A reset password has been sent to ' + user[0].email + '. It will be expire after 20 minutes. If you not get reset Email click on resend token.');
-                }
-            });
-=======
->>>>>>> d366d7b51f62b2ada67796a7fafa16814f9d8b7b
         });
 };
 
