@@ -37,11 +37,7 @@ export const apiClient = main;
 
 export function handleResponse(response) {
   if (response.status) {
-    if (response.status === 401) {
-      toastError('You have been disconnect, please reconnect')
-      userServices.logout();
-    }
-    else if (response.status >= 200 && response.status <= 299) {
+     if (response.status >= 200 && response.status <= 299) {
       return response.data;
     }
     else {

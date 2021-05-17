@@ -9,11 +9,13 @@ import {
 	Button,
 	Link
 } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
 import { userActions } from '../../redux/actions/userActions';
 import { userServices } from '../../redux/services/userServices';
 import { Redirect } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import { toastError, toastSuccess } from '../../redux/actions/alertActions';
 
@@ -27,16 +29,16 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-const fieldStyle = { width: "30ch", backgroundColor: "white", padding: "15px", margin: "15px", fontSize: "16px", borderRadius: "10px" };
+const fieldStyle = { width: "30ch", backgroundColor: "white", padding: "15px", margin: "0 15px 15px 15px", fontSize: "16px", borderRadius: "10px" };
 
 const Login = props => {
 	const classes = useStyles();
 	const [email, setemail] = useState("");
 	const [age, setage] = useState(20);
-	const [password, setPassword] = useState("e");
-	const [username, setusername] = useState("e");
-	const [firstname, setfirstname] = useState("e");
-	const [name, setname] = useState("e");
+	const [password, setPassword] = useState("");
+	const [username, setusername] = useState("");
+	const [firstname, setfirstname] = useState("");
+	const [name, setname] = useState("");
 	const [redirectRecover, setredirectRecover] = useState(false);
 	const [redirectlogin, setredirectlogin] = useState(false);
 
@@ -95,35 +97,51 @@ const Login = props => {
 					onSubmit={connectme}
 					onError={errors => console.log(errors)}
 				>
-					<TextValidator
-						name="email"
-						onChange={(e, val) => setemail(e.target.value)}
-						style={fieldStyle}
-						placeholder="Email"
-						type="email"
-						value={email}
-						validators={['required']}
-						errorMessages={['The email is required']}
-					/>
-					<TextValidator
-						name="name"
-						onChange={(e, val) => setname(e.target.value)}
-						style={fieldStyle}
-						placeholder="Nom"
-						type="text"
-						value={name}
-						validators={['required']}
-						errorMessages={['The name is required']}
-					/>
-					<TextValidator
-						name="firstname"
-						onChange={(e, val) => setfirstname(e.target.value)}
-						style={fieldStyle}
-						placeholder="Firstname"
-						validators={['required']}
-						value={firstname}
-						errorMessages={['The firstname is required']}
-					/>
+					<Box display="flex" justifyContent="flex-start" m={1} p={1}>
+						<Box p={1}><Typography style={{ }} variant="h6" gutterBottom>Email</Typography></Box>
+						<Box p={1}>
+							<TextValidator
+							name="email"
+							onChange={(e, val) => setemail(e.target.value)}
+							style={fieldStyle}
+							placeholder="Email"
+							type="email"
+							value={email}
+							validators={['required']}
+							errorMessages={['The email is required']}
+							/>
+						</Box>
+					</Box>
+					<Box display="flex" justifyContent="flex-start" m={1} p={1}>
+						<Box p={1}><Typography align="left" style={{ }} variant="h6" gutterBottom>Nom</Typography></Box>
+						<Box p={1}>
+							<TextValidator
+								name="name"
+								onChange={(e, val) => setname(e.target.value)}
+								style={fieldStyle}
+								placeholder="Nom"
+								type="text"
+								value={name}
+								validators={['required']}
+								errorMessages={['The name is required']}
+							/>
+						</Box>
+					</Box>
+					<Box display="flex" justifyContent="flex-end" m={1} p={1}>
+						<Box p={1}><Typography align="left" style={{ }} variant="h6" gutterBottom>Prenom</Typography></Box>
+						<Box p={1}>
+							<TextValidator
+								name="firstname"
+								onChange={(e, val) => setfirstname(e.target.value)}
+								style={fieldStyle}
+								placeholder="Firstname"
+								validators={['required']}
+								value={firstname}
+								errorMessages={['The firstname is required']}
+							/>
+						</Box>
+					</Box>
+					<Typography align="left" style={{marginLeft: "50px"}} variant="h6" gutterBottom>Email</Typography>
 					<TextField
 						name="age"
 						type="number"

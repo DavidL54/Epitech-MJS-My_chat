@@ -27,19 +27,37 @@ const useStyles = makeStyles((theme) => ({
 const fieldStyle = { width: "25ch", backgroundColor: "white", padding: "15px", margin: "15px", fontSize: "16px", borderRadius: "10px" };
 
 const Recover = props => {
+  const { form, confirmandlogin } = props;
   const [redirect, setredirect] = useState(false);
+  const [redirectcontact, setredirectcontact] = useState(false);
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
 
-  const { token } = useParams();
+  const { token, id  } = useParams();
 
-  useEffect(() => {
-    const form = props.form;
-    if (form && form.values && form.values.email) {
-      setemail(form.values.email);
-    }
-  }, []);
+  if (token && id) {
+    userServices.confirmaccount(id, token)
+      .then((res) => {
+        console.log(res);
+        if (res.statusText && res.statusText === "KO") {
+          setredirect(true);
+          toastError(res.message)
+        }
+        else if (!res.token) {
+          setredirect(true);
+          toastSuccess(res);
+        }
+        else {
+          confirmandlogin(res, setredirectcontact);
+        }
+      })
+  }
 
+  if (form && form.values && form.values.email) {
+    setemail(form.values.email);
+  }
+  
+ 
   const recoverme = () => {
     userServices.recover(JSON.stringify({ username: email }))
       .then(res => {
@@ -55,13 +73,24 @@ const Recover = props => {
         }
         else {
           setredirect(true);
-          toastSuccess('password changed with success');
+          toastSuccess('Password changed with success');
         }
       })
   }
 
   if (redirect) {
     return <Redirect push to="/login" />;
+  }
+  else if (redirectcontact) {
+    return <Redirect push to="/contact" />;
+  }
+  else if (token && id ) {
+    return (<div id="login" className="App">
+      <div className="login-container">
+
+        You will redirect...
+      </div>
+    </div>)
   }
   else if (token) {
     return (<div id="login" className="App">
@@ -140,7 +169,8 @@ function mapState(state) {
 
 const actionCreators = {
   login: userActions.login,
-  logout: userActions.logout
+  logout: userActions.logout,
+  confirmandlogin: userActions.confirmandlogin
 };
 
 const connectedLogin = connect(mapState, actionCreators)(Recover);

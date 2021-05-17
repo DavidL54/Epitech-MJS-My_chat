@@ -26,8 +26,8 @@ function Loading(props) {
 }
 
 const userIsNotAuthenticated = connectedRouterRedirect({
-    redirectPath: (state, ownProps) =>
-        locationHelper.getRedirectQueryParam(ownProps) || "/home",
+    redirectPath: (state, ownProps) => 
+        locationHelper.getRedirectQueryParam(ownProps) || "/contact",
     allowRedirectBack: false,
     authenticatedSelector: state => state.authentication.loggedIn !== true,
     wrapperDisplayName: "UserIsNotAuthenticated"
@@ -61,12 +61,12 @@ const Chat = Loadable({
 
 const wrappedRoutes = () => (
     <>
-            <Layout>
+        <Layout>
+            <Route exact path="/contact/:invitation?/:token?" component={Contact} />
             <Route exact path="/home" component={Home} />
-                <Route exact path="/chat" component={Chat} />
-                <Route exact path="/contact/:invitation?/:token?" component={Contact} />
-                <Route exact path="/account" component={Account} />
-            </Layout>
+            <Route exact path="/chat" component={Chat} />
+            <Route exact path="/account" component={Account} />
+        </Layout>
     </>
 );
 
@@ -75,6 +75,7 @@ const Router = () => (
         <Route exact path="/" component={userIsNotAuthenticated(LogIn)} />
         <Route exact path="/signup" component={userIsNotAuthenticated(SignUp)} />
         <Route path="/user/resetpassword/:token?" component={userIsNotAuthenticated(Recover)} />
+        <Route path="/user/confirmation/:id/:token" component={userIsNotAuthenticated(Recover)} />
         <Route path="/" component={userIsAuthenticated(wrappedRoutes)} />
     </Switch>
 );

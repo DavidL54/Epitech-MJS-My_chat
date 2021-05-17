@@ -30,10 +30,13 @@ const Room = (props) => {
   }, [])
 
   const leaveRoom = () => {
-    const newRoomArr = room.filter((item) => { return item._id.toString() !== selectedRoom.toString() })
-    setroom(newRoomArr);
-    setselectedRoom("");
-    setmodalRoom(false);
+    roomServices.deleteRoom(selectedRoom)
+      .then(res => {
+        const newRoomArr = room.filter((item) => { return item._id.toString() !== selectedRoom.toString() })
+        setroom(newRoomArr);
+        setselectedRoom("");
+        setmodalRoom(false);
+      });
   }
 
   if (loaded === true) {
