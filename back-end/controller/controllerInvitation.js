@@ -19,7 +19,6 @@ async function userJoinRoom(req, res, info) {
         if (!room.allowUser.includes(info.userid)) {
             let newAllow = [...room.allowUser];
             newAllow.push(info.userid);
-            console.log("update");
             await Room.findOneAndUpdate({ _id: info.roomid }, { allowUser: newAllow }, { new: true }).exec();
             res.status(200).json("You have accepted successfully")
         }
@@ -70,14 +69,6 @@ exports.createInvit = (req, res) => {
             res.status(400).send(err);
         }
         else {
-
-                /*const token = jwt.sign({ _id: inv.value }, config.JWT_KEY_RESET, { expiresIn: "20m" })
-                console.log("mail sended to", inv.email, inv.label, room.name)
-                await sendMail(inv.email, 'Invitation to join room', 'Hello ' + inv.label + ',\n\n' + 'You\'re invited to join room' + room.name + '\n\n'
-                    + 'Please click on given link to reset your password: \nhttp:\/\/' + '127.0.0.1:3000' + '\/room\/invitation\/' + token + '\n\nThank You!\n');
-*/
-
-
             res.status(201).json(invit);
         }
     });
@@ -88,7 +79,6 @@ exports.updateInvitState = (req, res) => {
     if (req.body.token) {
         jwt.verify(req.body.token, config.JWT_KEY_RESET, async (err, info) => {
             if (err) return res.status(200).json("error for verify token")
-            console.log(info);
             if (info.invit === "joinroom") {
                 userJoinRoom(req, res, info);
             }
@@ -148,8 +138,6 @@ exports.getAvalaibleUserInvitRoomcreate = (req, res) => {
                     user.iscommun = iscommun;
                     finRes.push(user);
                 }
-
-                console.log(finRes);
                 res.status(200).json(finRes);
             }
         });

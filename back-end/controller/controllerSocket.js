@@ -8,12 +8,10 @@ function socketHandler(socket, decoded, channel, io) {
     socket.on('connected', (state) => {
         users = { ...users }
         users[decoded.userId] = state;
-        console.log("chatstate");
         io.sockets.emit("chatstate", users);
     });
 
     socket.on('disconnect', () => {
-        console.log('Got disconnect!');
         users = { ...users }
         users[decoded.userId] = 0;
         io.sockets.emit("chatstate", users);
@@ -52,7 +50,6 @@ exports.whenConnected = (conn, io) => {
             socketHandler(socket, decoded, channel, io);
             
             await channel.consume(`Queue_${decoded.userId}`, (msg) => {
-                console.log(msg.properties.timestamp);
                 if (msg.content) {
                     const { sender } = JSON.parse(msg.content);
                     if (sender != decoded.userId) {

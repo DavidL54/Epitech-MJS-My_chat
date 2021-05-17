@@ -1,7 +1,7 @@
 const Room = require('../models/modelRoom');
 const User = require('../models/modelUser');
 const Invitation = require('../models/modelInvitation');
-const sendMail = require('../middleware/sendMail');
+const controllerMail = require('./controllerMail');
 const config = require('../config');
 const jwt = require('jsonwebtoken');
 var amqplib = require('amqplib');
@@ -42,11 +42,9 @@ async function treatInvit(req, room, invitations) {
                 receiver: inv.value,
                 roomid: room._id,
             });
-            const token = jwt.sign({ userid: inv.value, roomid: room._id, roomname: req.body.name, invit: 'joinroom', invitid: invit._id }, config.JWT_KEY_RESET, { expiresIn: "7d" })
+            const token = await jwt.sign({ userid: inv.value, roomid: room._id, roomname: req.body.name, invit: 'joinroom', invitid: invit._id }, config.JWT_KEY_RESET, { expiresIn: "7d" })
             await invit.save();
-            console.log("mail sended to", inv.email, inv.label, room.name)
-            await sendMail(`D.E.scord <${inv.email}>`, 'Invitation to join room', 'Hello ' + inv.label + ',\n\n' + 'You\'re invited to join room' + room.name + '\n\n'
-                + 'Please click on given link to reset your password: \nhttp:\/\/' + '127.0.0.1:3000' + '\/contact\/invitation\/' + token + '\n\nThank You!\n');
+            await controllerMail.joinroom(inv, room, token);
         }
     }
     await Room.findByIdAndUpdate(room._id, { allowUser: addimmediatUsers }, { new: true },).exec();
@@ -82,7 +80,6 @@ async function defineNewAdmin(newadminid, room) {
     allowWithoutAdm.push(oldadmin);
 
     const ret = await Room.findByIdAndUpdate(room._id, { allowUser: allowWithoutAdm, roomAdmin: newadminid }, { new: true },).exec();
-    console.log(ret);
 }
 
 exports.updateRoom = (req, res) => {
@@ -90,7 +87,6 @@ exports.updateRoom = (req, res) => {
         if (room.length === null) {
             return res.status(409).json('Room exists');
         } else {
-            console.log(req.body)
             if (req.body.invitation && req.body.invitation.length > 0) {
                 await treatInvit(req, room, req.body.invitation);
             }
@@ -111,7 +107,6 @@ exports.deleteRoom = (req, res) => {
             res.status(404).json({ error: 'Server was unable to find this room' });
         }
         else {
-            console.log(`Room_${req.params.id}`);
             var conn = await amqplib.connect(config.RABBITURL, heartbeat = 60);
             var ch = await conn.createChannel()
             await ch.removeAllListeners(`Room_${req.params.id}`);
