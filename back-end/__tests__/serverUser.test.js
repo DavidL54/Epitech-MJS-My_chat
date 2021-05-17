@@ -215,7 +215,20 @@ describe("Room routes", () => {
     })
 
     describe('Get Room by user', () => {
+        it( 'get Room', async done => {
+            const create = await createRoom((templates.loginTemplate))
+            const findRoomBefore = await Room.find({})
 
+            expect(findRoomBefore.length).toEqual(1)
+
+            const deleteRoom = await request.delete(`/room/${create.room.body._id}`)
+                .set('authorization', `Bearer ${create.token}`)
+            const findRoomAfter = await Room.find({})
+
+            expect(deleteRoom.status).toEqual(200)
+            expect(findRoomAfter.length).toEqual(0)
+            done()
+        })
     })
 });
 
