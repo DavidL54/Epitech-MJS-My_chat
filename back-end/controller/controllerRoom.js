@@ -17,7 +17,6 @@ exports.getAll = (req, res) => {
                 return res.status(200).json(room);
             }
         });
-
 };
 
 async function createBindingRoom(idroom, iduser) {

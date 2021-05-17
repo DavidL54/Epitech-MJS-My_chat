@@ -4,9 +4,11 @@ const controllerMail = require('./controllerMail');
 const User = require('../models/modelUser');
 const Room = require('../models/modelRoom');
 const Token = require('../models/modelToken')
+
+const config = require("../config")
+
+
 var amqplib = require('amqplib');
-const config = require('../config');
-require("dotenv").config();
 
 exports.getAll = (req, res) => {
     User.find({}, (error, user) => {
