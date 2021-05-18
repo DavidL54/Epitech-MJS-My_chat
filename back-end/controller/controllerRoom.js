@@ -127,7 +127,7 @@ exports.getRoomByUser = (req, res) => {
 };
 
 exports.getAllowRoomByUser = (req, res) => {
-  Room.find({ $or: [{ roomAdmin: req.params.id }, { allowUser: req.params.id }] }).select('name').exec()
+  Room.find({ $or: [{ roomAdmin: req.params.id }, { allowUser: req.params.id }] }).exec()
     .then((rooms, err) => {
       if (err) {
         res.status(400).json(err);

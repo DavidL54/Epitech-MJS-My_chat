@@ -44,10 +44,12 @@ const Room = (props) => {
       <>
         <List dense={true}>
           {room.map(con => {
+            console.log(con)
+            const isdamin = con.roomAdmin === props.user.userId ? true : false;
             const color = selectedRoom === con._id ? "#0069B4" : "#5a98c4";
             return (
               <ListItem button style={{ backgroundColor: color, borderRadius: "5px", border: "1px black solid", margin: "5px" }}>
-                <ListItemIcon ><ClearIcon style={{ color: "red" }} onClick={() => { setselectedRoom(con._id); setmodalRoom(true); }} /></ListItemIcon>
+                { isdamin ? <ListItemIcon ><ClearIcon style={{ color: "red" }} onClick={() => { setselectedRoom(con._id); setmodalRoom(true); }} /></ListItemIcon> : <div />}
                 <ListItemText
                   primary={con.name}
                   onClick={() => setselectedRoom(con._id)}
