@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import '../../scss/Login.scss';
-import config from "../../config";
-import queryString from 'query-string';
 import { Field, reduxForm, change } from 'redux-form';
 import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
@@ -9,11 +7,10 @@ import {
 	Button,
 	Link
 } from '@material-ui/core';
+import logo from '../../img/logo.svg';
 import { userActions } from '../../redux/actions/userActions';
-import { userServices } from '../../redux/services/userServices';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import { Redirect } from 'react-router-dom';
-import { toastError, toastSuccess } from '../../redux/actions/alertActions';
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -66,7 +63,7 @@ const Login = props => {
 		return (
 			<div id="login" className="App">
 				<div className="login-container">
-					<h1 className="title">D.E.scord</h1>
+					<img src={logo} alt="Descord Logo" style={{ height: "80px" }} />
 					<p>Please login to access on chat</p>
 
 						<ValidatorForm

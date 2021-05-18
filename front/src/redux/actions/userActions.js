@@ -68,6 +68,7 @@ function confirmandlogin(logged, setredirectcontact) {
 		localStorage.setItem('user', decoded)
 		dispatch(loginSuccess({ loggedIn: true, jwt: logged.token }))
 		dispatch(dispatchUser(decoded));
+		console.log(logged);
 		toastSuccess(logged.result);
 		setredirectcontact(true);
 	};

@@ -72,13 +72,13 @@ exports.signup = (req, res) => {
 };
 
 exports.confirmEmailToken = (req, res) => {
-  Token.findOne({ token: req.params.token }, (err, token) => {
+  Token.findOne({ token: req.params.token }, (err, tok) => {
     // token is not found into database i.e. token may have expired
-    if (!token) {
+    if (!tok) {
       return res.status(400).send('Your verification link may have expired. Please click on resend for verify your Email.');
     }
     // if token is found then check valid user
-    User.findOne({ _id: token._userId, email: req.params.email }, (err, user) => {
+    User.findOne({ _id: tok._userId, email: req.params.email }, (err, user) => {
       // not valid user
       if (!user) {
         return res.status(401).send('We were unable to find a user for this verification. Please SignUp!');
@@ -90,7 +90,7 @@ exports.confirmEmailToken = (req, res) => {
       // verify user
 
       // change isVerified to true
-      user.active = true;
+      //user.active = true;
       user.save((err) => {
         // error occur
         if (err) {
@@ -98,7 +98,7 @@ exports.confirmEmailToken = (req, res) => {
         }
         // account successfully verified
 
-        const newToken = jwt.sign({
+        const token = jwt.sign({
           name: user.name,
           firstname: user.firstname,
           email: user.email,
@@ -109,7 +109,7 @@ exports.confirmEmailToken = (req, res) => {
         });
         return res.status(200).json({
           result: 'Your account has been successfully verified',
-          newToken,
+          token,
         });
       });
     });

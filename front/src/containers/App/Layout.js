@@ -22,12 +22,13 @@ import SearchIcon from '@material-ui/icons/Search';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import ContactPhoneIcon from '@material-ui/icons/ContactPhone';
-import PersonIcon from '@material-ui/icons/Person';
+import logo from '../../img/logo.svg';
 import { sidebarActions } from '../../redux/actions/sidebarActions'
 import { loadReceivedMessage, chatHandler, tappingHandler } from '../../redux/actions/socketAction'
 import { NavLink } from 'react-router-dom'
 import { SocketContext } from '../App/SocketComponent';
 import { auth } from '../../helpers/authHeader'
+import Box from '@material-ui/core/Box';
 
 const drawerWidth = 240;
 
@@ -173,7 +174,7 @@ const Layout = (props) => {
 			setOpen(props.sidebar.visibility);
 		}
 		if (props.user.name) {
-			setusername(`${props.user.name} ${props.user.firstname} ${props.user.userId}`)
+			setusername(`${props.user.name} ${props.user.firstname}`)
 			socket.emit('connected', true);
 			const token = auth.getAccessToken();
 			socket.emit('authentificate', token);
@@ -222,12 +223,18 @@ const Layout = (props) => {
 					>
 						<MenuIcon/>
 					</IconButton>
-					<Typography className={classes.title} variant="h6" noWrap>
-							D.E.scord
-					</Typography>
-						<Typography className={classes.title} variant="h6" noWrap>
-							{username}
-					</Typography>
+					<Box display="flex" style={{width: "100%"}}>
+						<Box display="flex" justifyContent="flex-start" >
+							<img src={logo} alt="Descord Logo" style={{ height: "60px" }} />
+						</Box>
+						<Box display="flex" justifyContent="flex-end" style={{ width: "100%" }}>
+							<Box style={{marginRight: "50px", marginTop: "15px"}}>
+								<Typography className={classes.title} variant="h6" noWrap>
+									{username}
+								</Typography>
+							</Box>
+						</Box>
+					</Box>
 				</Toolbar>
 			</AppBar>
 			<Drawer
