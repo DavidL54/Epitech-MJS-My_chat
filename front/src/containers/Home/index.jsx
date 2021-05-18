@@ -29,7 +29,7 @@ const Home = (props) => {
 						<img src={logo} alt="Descord Logo" style={{ height: "200px" }} />
 					</Box>
 					<Box style={{ width: '100%' }}>
-						Why D.E.cord ? It's for "David" "Elian" and "scord" like the famous chat of course !	
+						Why D.E.scord ? It's for "David" "Elian" and "scord" like the famous chat of course !	
 					</Box>
 				</Box>
 				<div>

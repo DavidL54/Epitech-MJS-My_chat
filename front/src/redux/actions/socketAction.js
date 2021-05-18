@@ -16,7 +16,6 @@ export const loadReceivedMessage = (socket) => {
   return (dispatch, getState) => {
     socket.on('message', async (mess, idmess, timemsg) => {
       let parsed = JSON.parse(mess)
-      console.log(timemsg);
       if (timemsg > 20)
         parsed['new'] = true;
       parsed['id'] = idmess;
