@@ -105,7 +105,6 @@ const Message = (props) => {
 										<Box display="flex" justifyContent="flex-start" m={1} p={1}>
 											<Box p={1} borderRadius={10} bgcolor="#AECEE7">
 												<Box>{newFlag}{`${displayName} : `}{con.message}</Box>
-												<Box>{con.read ? con.read.length : "0" } read</Box>
 											</Box>
 										</Box>
 									</div>
