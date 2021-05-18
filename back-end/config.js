@@ -1,5 +1,5 @@
 
-const istest = false;
+const istest = true;
 
 const mongourl = istest ? '127.0.0.1' : 'mongo';
 const rabbiturl = istest ? '127.0.0.1' : 'rabbitmq';

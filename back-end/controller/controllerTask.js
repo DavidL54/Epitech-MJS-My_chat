@@ -1,22 +1,21 @@
-
+const Agenda = require('agenda');
 const config = require('../config');
-let Agenda = require("agenda");
-const sendMail = require('../middleware/sendMail')
+const sendMail = require('../middleware/sendMail');
 
-let task = new Agenda({ db: { address: config.DBHost, collection: 'tasks' } });
+const task = new Agenda({ db: { address: config.DBHost, collection: 'tasks' } });
 
-task.define("sendMail", (job, done) => {
+task.define('sendMail', (job, done) => {
   sendMail(job.attrs.data.to, job.attrs.data.subject, job.attrs.data.content);
   done();
-})
+});
 
 task.on('ready', async () => await task.start());
 
-let graceful = () => {
+const graceful = () => {
   task.stop(() => process.exit(84));
-}
+};
 
-process.on("SIGTERM", graceful);
-process.on("SIGINT", graceful);
+process.on('SIGTERM', graceful);
+process.on('SIGINT', graceful);
 
 module.exports = task;

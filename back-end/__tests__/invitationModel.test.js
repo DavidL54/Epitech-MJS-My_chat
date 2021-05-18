@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
 
-const mongoDB = 'mongodb://127.0.0.1:27017/my_test_database';
+const mongoDB = 'mongodb://127.0.0.1:27017/my_test_database_invitation';
 
 mongoose.connect(mongoDB).then(() => console.log('Successfully connected to the database'));
 
 const User = require('../models/modelUser');
-const templates = require('../__config_tests__/templates');
 
 describe('test', () => {
   beforeAll(async () => {
@@ -24,8 +23,14 @@ describe('test', () => {
     expect(User).toBeDefined();
   });
   describe('User testing', () => {
-    const { userTemplate } = templates;
-
+    const userTemplate = {
+      email: 'elian.nicaise54@gmail.com',
+      password: 'PAPA',
+      username: 'elian',
+      name: 'elian',
+      firstname: 'papa',
+      age: 19,
+    };
     it('gets a user', async () => {
       const user = new User(userTemplate);
       await user.save();

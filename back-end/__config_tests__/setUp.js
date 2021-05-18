@@ -1,4 +1,9 @@
+const User = require('../models/modelUser')
+const Room = require('../models/modelRoom')
+
 async function removeAllCollections (mongoose) {
+    await User.remove({})
+    await Room.remove({})
     const collections = Object.keys(mongoose.connection.collections)
     for (const collectionName of collections) {
         const collection = mongoose.connection.collections[collectionName]
@@ -26,6 +31,8 @@ async function dropAllCollections (mongoose) {
 module.exports = {
     setUp (mongoose) {
         afterEach(async () => {
+            // await User.remove({})
+            // await Room.remove({})
             await removeAllCollections(mongoose)
         })
 
