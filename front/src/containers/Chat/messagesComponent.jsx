@@ -49,14 +49,17 @@ const Message = (props) => {
 	const [loaded, setLoaded] = useState(true);
 	const [roomMessage, setroomMessage] = useState([]);
 	const contactKeys = Object.keys(contact);
-	
+	const socket = useContext(SocketContext);
 	
 	useEffect(() => {
 		if (selectedRoom) {
 			chatServices.getLastMessageByRoomId(selectedRoom)
 				.then(async (res) => {
 					const idmsg = [];
-					await res.forEach(msg => idmsg.push(msg.idmsg));
+					await res.forEach(msg => {
+						socket.emit('read', msg.idmsg);
+						idmsg.push(msg.idmsg)
+					});
 					let ret = [...res];
 					await props.socket.message.forEach(msg => {
 						if (!idmsg.includes(msg.idmsg))
@@ -80,15 +83,19 @@ const Message = (props) => {
 							}
 							let newFlag = (<div />)
 
-							if (con.new) {
+							if (con.sender !== props.user.userId && con.read && !con.read.includes(props.user.userId)) {
 								newFlag = <NewReleasesIcon />;
 							}
 
+							const read = con.read ? con.read.length - 1 : 0;
 							if (con.sender == props.user.userId)
 								return (
 									<div style={{ width: '100%' }}>
 										<Box display="flex" justifyContent="flex-end" m={1} p={1}>
-											<Box p={1} borderRadius={10} bgcolor="#E0EC8A"> {con.message} {`: ${displayName}`}{newFlag}</Box>
+											<Box p={1} borderRadius={10} bgcolor="#E0EC8A">
+												<Box>{con.message} {`: Me`}{newFlag}</Box>
+												<Box display="flex" style={{fontSize: "10px"}} justifyContent="flex-end" >{read < 0 ? 0: read} read</Box>
+											</Box>
 										</Box>
 									</div>
 								);
@@ -96,7 +103,10 @@ const Message = (props) => {
 								return (
 									<div style={{ width: '100%' }}>
 										<Box display="flex" justifyContent="flex-start" m={1} p={1}>
-											<Box p={1} borderRadius={10} bgcolor="#AECEE7"> {newFlag}{`${displayName} : `}{con.message}</Box>
+											<Box p={1} borderRadius={10} bgcolor="#AECEE7">
+												<Box>{newFlag}{`${displayName} : `}{con.message}</Box>
+												<Box>{con.read ? con.read.length : "0" } read</Box>
+											</Box>
 										</Box>
 									</div>
 								);
@@ -123,20 +133,7 @@ function mapStateToProps(state) {
 }
 
 const actionCreators = {
-	sendMessage
+	sendMessage,
 }
 
 export default connect(mapStateToProps, actionCreators)(Message);
-
-/*
-
-		<ListItem display="flex" justifyContent="flex-end" style={{ backgroundColor: "#f7f7b7", borderRadius: "5px", margin: "5px" }}>
-									<Box display="flex" justifyContent="flex-end" m={1} p={1} bgcolor="background.paper">
-										{newFlag}{`${displayName} : `}
-										<ListItemText
-											primary={con.message}
-										/>
-									</Box>
-								</ListItem>
-
-								*/

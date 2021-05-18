@@ -13,10 +13,8 @@ const userSchema = mongoose.Schema({
     firstname : {type: String, required: true},
     age : {type: Number, required: true},
     active: {type: Boolean, default : false},
-    resetLink: {
-        data: String,
-        default: ''
-    }
+    resetLink: { data: String, default: ''},
+    lastDisconnect: { type: Date }
 });
 
 module.exports = mongoose.model('User', userSchema);

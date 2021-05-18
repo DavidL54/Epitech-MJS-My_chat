@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const Message = require('../models/modelMessage');
+const User = require('../models/modelUser');
 
 var users = {};
 
@@ -9,6 +10,9 @@ function socketHandler(socket, decoded, channel, io) {
         users = { ...users }
         users[decoded.userId] = state;
         io.sockets.emit("chatstate", users);
+        if (state === 1) {
+            User.findByIdAndUpdate(decoded.userId, {lastDisconnect: Date.now()}, { new: true }).exec();
+        }
     });
 
     socket.on('disconnect', () => {
@@ -27,6 +31,16 @@ function socketHandler(socket, decoded, channel, io) {
 
             console.log("Publish sur exchange", `Room_${roomid}`, message);
             await channel.publish(`Room_${roomid}`, '', new Buffer.from(JSON.stringify(data)), { messageId: idmsg.toString(), timestamp: Date.now() });
+        }
+    })
+
+    socket.on('read', async (messageid) => {
+        if (messageid) {
+            let message = await Message.findOne({ idmsg: messageid }).exec();
+            if (! message.read.includes(decoded.userId.toString())) {
+                message.read = [...message.read, decoded.userId];
+                await message.save();
+            }
         }
     })
 
