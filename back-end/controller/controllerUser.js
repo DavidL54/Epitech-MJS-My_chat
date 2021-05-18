@@ -90,7 +90,7 @@ exports.confirmEmailToken = (req, res) => {
       // verify user
 
       // change isVerified to true
-      //user.active = true;
+      user.active = true;
       user.save((err) => {
         // error occur
         if (err) {
