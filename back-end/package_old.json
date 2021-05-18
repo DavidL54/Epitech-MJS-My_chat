@@ -1,5 +1,5 @@
 {
-  "name": "back-end-Grimoire",
+  "name": "back-end-DESCORD",
   "version": "1.0.0",
   "main": "server.js",
   "license": "MIT",
@@ -9,6 +9,7 @@
     "test": "jest --runInBand ./__tests__"
   },
   "dependencies": {
+    "agenda": "^4.1.3",
     "amqplib": "^0.7.1",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
@@ -16,6 +17,7 @@
     "dotenv": "^9.0.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
     "mongoose": "^5.9.20",
     "mongose": "^0.0.2-security",
     "morgan": "^1.9.0",

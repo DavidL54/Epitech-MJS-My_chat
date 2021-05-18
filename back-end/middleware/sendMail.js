@@ -11,12 +11,14 @@ const transporter = nodemailer.createTransport({
 
 module.exports = (to, subject, message) => {
     const mailOptions = {
-        from: 'D.E Scord',
+        from: 'D.E.scord <d.e.scord5499@gmail.com>',
         to: to,
         subject: subject,
         text: message,
     };
+
     transporter.sendMail(mailOptions, function (err) {
+        console.log(err)
         if (err)
             return false;
         return true;

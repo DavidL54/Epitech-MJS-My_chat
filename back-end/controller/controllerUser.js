@@ -1,8 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
-const crypto = require('crypto');
-const sendMail = require('../middleware/sendMail')
+const controllerMail = require('./controllerMail');
 const User = require('../models/modelUser');
 const Room = require('../models/modelRoom');
 const Token = require('../models/modelToken')
@@ -55,32 +53,24 @@ exports.signup = (req, res) => {
                         age: req.body.age
                     });
                     user.save().then(async () => {
-                        // generate token and save
-                        const token = new Token({
-                            _userId: user._id,
-                            token: crypto.randomBytes(16).toString('hex')
-                        });
-                        token.save()
-                        sendMail(user.email, 'Account Verification Link',
-                            'Hello ' + req.body.name + ',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + '127.0.0.1:3000' + '\/user\/confirmation\/' + user.email + '\/' + token.token + '\n\nThank You!\n');
-
-
                         var conn = await amqplib.connect(config.RABBITURL);
                         var ch = await conn.createChannel()
                         await ch.assertQueue(`Queue_${user._id}`, { durable: true});
                         await ch.close();
                         await conn.close();
 
-
+                        await controllerMail.accountverification(user);
 
                         res.status(201).json({
                             message: "A confirmation email has been sent.Please click on the link in it to confirm your account"
                         });
                     })
                         .catch(err => {
+                            console.log(err);
                             res.status(500).json(err);
                         });
                 } else {
+                    console.log(err);
                     return res.status(500).json(err);
                 }
             });
@@ -138,30 +128,32 @@ exports.confirmEmailToken = (req, res) => {
 };
 
 exports.login = (req, res) => {
-    User.find({ "$or": [{ email: req.body.username }, { username: req.body.username }] }).exec()
-        .then((user, err) => {
-            if (user.length < 1) {
+    User.findOne({ "$or": [{ email: req.body.username }, { username: req.body.username }] }).exec()
+        .then((user) => {
+            if (user === null) {
                 return res.status(404).json('The credential you provided do not match.Do you want to recover your password');
             }
-            bcrypt.compare(req.body.password, user[0].password, (err, result) => {
+            bcrypt.compare(req.body.password, user.password, async (err, result) => {
                 if (err)
                     return res.status(401).json('Auth failed');
                 else if (result) {
-                    if (!user[0].active) {
-                        return res.status(409).json('Your account has not yet been confirmed')
+                    if (!user.active) {
+                        await controllerMail.accountverification(user);
+                        return res.status(409).json('Your account has not yet been confirmed. Check your Mailbox')
                     }
                     else {
                         if (result) {
                             const token = jwt.sign({
-                                name: user[0].name,
-                                firstname: user[0].firstname,
-                                email: user[0].email,
-                                userId: user[0]._id
+                                name: user.name,
+                                firstname: user.firstname,
+                                email: user.email,
+                                userId: user._id
                             },
                                 config.JWT_KEY, {
                                 expiresIn: "90d"
                             }
                             );
+                            await controllerMail.accountLogin(user);
                             return res.status(200).json({
                                 message: 'OK',
                                 token: token
@@ -179,7 +171,7 @@ exports.login = (req, res) => {
 exports.generateLink = (req, res) => {
     User.findOne({ "$or": [{ email: req.body.username }, { username: req.body.username }] })
         .exec()
-        .then(user => {
+        .then(async (user) => {
             // user is not found into database
             if (!user) {
                 return res.status(400).send('We were unable to find a user with that email. Make sure your Email is correct!');
@@ -190,16 +182,8 @@ exports.generateLink = (req, res) => {
             }
             // send verification link
             else {
-                // generate token and save
-                const token = new Token({ _userId: user._id, token: crypto.randomBytes(16).toString('hex') });
-                token.save(function (err) {
-                    if (err) {
-                        return res.status(500).send(err.message);
-                    }
-                    sendMail(user.email, 'Account Verification Link',
-                        'Hello ' + user.name + ',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/127.0.0.1:3000\/user\/confirmation\/' + user.email + '\/' + token.token + '\n\nThank You!\n')
-                    return res.status(200).send('A verification email has been sent to ' + user.email + '. It will be expire after one day. If you not get verification Email click on resend token.');
-                });
+                await controllerMail.accountverification(user);
+                return res.status(200).send('A verification email has been sent to ' + user.email + '. It will be expire after one day. If you not get verification Email click on resend token.');
             }
         });
 }
@@ -226,12 +210,11 @@ exports.forgotpass = (req, res) => {
             }
             else {
                 const token = jwt.sign({ _id: user._id }, config.JWT_KEY_RESET, { expiresIn: "20m" })
-                user.updateOne({ resetLink: token }, (err, succes) => {
+                user.updateOne({ resetLink: token }, async (err, succes) => {
                     if (err) {
                         res.status(400).json('reset password link error')
                     } else {
-                        sendMail(user.email, 'Reset Password Link', 'Hello ' + user.name + ',\n\n' + 'Please click on given link to reset your password: \nhttp:\/\/' + '127.0.0.1:3000' + '\/user\/resetpassword\/' + token + '\n\nThank You!\n')
-                        
+                        await controllerMail.forgotpass(user, token);
                         res.status(200).send('A recover email has been sent to this email.Please follow the instructions in it to recover your account');
                     }
                 });
