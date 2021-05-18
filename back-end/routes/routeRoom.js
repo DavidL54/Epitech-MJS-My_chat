@@ -1,5 +1,4 @@
 const controllerRoom = require('../controller/controllerRoom');
-
 const checkAuth = require('../middleware/check-auth');
 
 module.exports = (app, conn) => {

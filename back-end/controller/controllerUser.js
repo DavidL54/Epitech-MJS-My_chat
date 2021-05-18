@@ -105,7 +105,7 @@ exports.confirmEmailToken = (req, res) => {
           userId: user._id,
         },
         config.JWT_KEY, {
-          expiresIn: '90d',
+          expiresIn: config.LOGIN_TOKEN_EXPIRATION,
         });
         return res.status(200).json({
           result: 'Your account has been successfully verified',
@@ -138,7 +138,7 @@ exports.login = (req, res) => {
               userId: user._id,
             },
             config.JWT_KEY, {
-              expiresIn: '90d',
+              expiresIn: config.LOGIN_TOKEN_EXPIRATION
             });
             await controllerMail.accountLogin(user);
             return res.status(200).json({
@@ -192,7 +192,7 @@ exports.forgotpass = (req, res) => {
       if (user == null) {
         res.status(400).json('A recover email has been sent to this email.Please follow the instructions in it to recover your account');
       } else {
-        const token = jwt.sign({ _id: user._id }, config.JWT_KEY_RESET, { expiresIn: '20m' });
+        const token = jwt.sign({ _id: user._id }, config.JWT_KEY_RESET, { expiresIn: config.RESET_PASS_TOKEN_EXPIRATION });
         user.updateOne({ resetLink: token }, async (err) => {
           if (err) {
             res.status(400).json('reset password link error');
@@ -225,7 +225,7 @@ exports.resetPass = (req, res) => {
               userId: user._id,
             },
             config.JWT_KEY, {
-              expiresIn: '90d',
+              expiresIn: config.LOGIN_TOKEN_EXPIRATION
             });
             return res.status(200).json({
               result: 'Your password has been changed',

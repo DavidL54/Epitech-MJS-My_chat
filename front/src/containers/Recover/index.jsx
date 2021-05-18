@@ -48,7 +48,6 @@ const Recover = props => {
   if (token && id) {
     userServices.confirmaccount(id, token)
       .then((res) => {
-        console.log(res);
         if (res.statusText && res.statusText === "KO") {
           setredirect(true);
           toastError(res.message)
@@ -88,7 +87,6 @@ const Recover = props => {
     if (password && repeatPassword && password === repeatPassword) {
       userServices.resetpasswordCallback(token, JSON.stringify({ newpass: password }))
         .then(res => {
-          console.log(res);
           if (res.statusText && res.statusText === "KO") {
             toastError(`Error : ${res.message}`);
           }

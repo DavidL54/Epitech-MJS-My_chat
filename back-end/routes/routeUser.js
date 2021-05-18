@@ -1,5 +1,4 @@
 const controllerUser = require('../controller/controllerUser');
-
 const checkAuth = require('../middleware/check-auth');
 
 module.exports = (app) => {

@@ -44,7 +44,6 @@ const Room = (props) => {
       <>
         <List dense={true}>
           {room.map(con => {
-            console.log(con)
             const isdamin = con.roomAdmin === props.user.userId ? true : false;
             const color = selectedRoom === con._id ? "#0069B4" : "#5a98c4";
             return (

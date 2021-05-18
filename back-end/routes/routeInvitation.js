@@ -1,5 +1,4 @@
 const controllerInvitation = require('../controller/controllerInvitation');
-
 const checkAuth = require('../middleware/check-auth');
 
 module.exports = (app) => {

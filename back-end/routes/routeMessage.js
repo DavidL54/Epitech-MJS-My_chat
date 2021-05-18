@@ -1,5 +1,4 @@
 const controllerMessage = require('../controller/controllerMessage');
-
 const checkAuth = require('../middleware/check-auth');
 
 module.exports = (app) => {

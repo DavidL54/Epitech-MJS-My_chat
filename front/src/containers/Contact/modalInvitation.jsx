@@ -54,7 +54,6 @@ const ModalRoom = (props) => {
   let info;
   try {
     info = jwt_decode(token)
-    console.log(info);
   }
   catch {
     toastError("Invalid token");
@@ -63,7 +62,6 @@ const ModalRoom = (props) => {
 
 
   const respond = (res) => {
-    console.log(info.invitid);
     invitServices.responseInvit(info.invitid, JSON.stringify({ token, res: res }))
       .then(ret => {
         toastSuccess(ret)

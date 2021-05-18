@@ -39,7 +39,7 @@ async function treatInvit(req, room, invitations) {
       });
       const token = await jwt.sign({
         userid: inv.value, roomid: room._id, roomname: req.body.name, invit: 'joinroom', invitid: invit._id,
-      }, config.JWT_KEY_RESET, { expiresIn: '7d' });
+      }, config.JWT_KEY_RESET, { expiresIn: config.JOIN_ROOM_TOKEN_EXPIRATION });
       await invit.save();
       await controllerMail.joinroom(inv, room, token);
     }
