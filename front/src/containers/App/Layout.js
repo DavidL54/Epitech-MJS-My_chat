@@ -259,7 +259,7 @@ const Layout = (props) => {
 				<List className={classes.itemToolBar}>
 					<ListItem button key={"home"} component={NavLink} to="/home">
 						<ListItemIcon className={classes.itemToolBar} ><HomeIcon/></ListItemIcon>
-						<ListItemText primary={"Accueil"}/>
+						<ListItemText primary={"Home"}/>
 					</ListItem>
 					<ListItem button key={"chat"} component={NavLink} to="/chat">
 						<ListItemIcon className={classes.itemToolBar} ><ChatIcon /></ListItemIcon>
@@ -271,7 +271,7 @@ const Layout = (props) => {
 					</ListItem>
 					<ListItem onClick={logout} button key={"exit"}>
 						<ListItemIcon className={classes.itemToolBar}><ExitToAppIcon/></ListItemIcon>
-						<ListItemText primary={"Se deconnecter"}/>
+						<ListItemText primary={"Disconnect"}/>
 					</ListItem>
 				</List>
 			</Drawer>

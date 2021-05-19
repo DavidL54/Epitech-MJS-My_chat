@@ -9,6 +9,7 @@ import {
   Button,
   Link
 } from '@material-ui/core';
+import logo from '../../img/logo.svg';
 import { userActions } from '../../redux/actions/userActions';
 import { userServices } from '../../redux/services/userServices';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
@@ -114,7 +115,7 @@ const Recover = props => {
   else {
     return (<div id="login" className="App">
       <div className="login-container">
-        <h1 className="title">D.E.scord</h1>
+        <img src={logo} alt="Descord Logo" style={{ height: "80px" }} />
         <p>{token ? "Set new password": "Send recover link"}</p>
         <ValidatorForm
           onSubmit={token ? changepassword : recoverme}

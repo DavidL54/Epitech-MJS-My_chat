@@ -9,6 +9,7 @@ import {
 	Button,
 	Link
 } from '@material-ui/core';
+import logo from '../../img/logo.svg';
 import { userActions } from '../../redux/actions/userActions';
 import { userServices } from '../../redux/services/userServices';
 import { Redirect } from 'react-router-dom';
@@ -89,7 +90,7 @@ const Login = props => {
 	return (
 		<div id="login" className="App">
 			<div className="login-container">
-				<h1 className="title">D.E.scord</h1>
+				<img src={logo} alt="Descord Logo" style={{ height: "80px" }} />
 				<p>SignUp</p>
 				<ValidatorForm
 					onSubmit={connectme}
