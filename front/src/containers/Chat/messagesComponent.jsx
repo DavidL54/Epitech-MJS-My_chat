@@ -113,8 +113,8 @@ const Message = (props) => {
 								displayName = contact[con.sender].name;
 							}
 							let newFlag = (<div />)
-
-							if (con.sender !== props.user.userId && con.read && !con.read.includes(props.user.userId) && Date.now() - Date(con.updated_at) > 20) {
+							const timemsg = new Date(con.updated_at).getTime();
+							if (con.sender !== props.user.userId && con.read && !con.read.includes(props.user.userId) && Date.now() - timemsg > 20000) {
 								newFlag = <NewReleasesIcon />;
 							}
 
