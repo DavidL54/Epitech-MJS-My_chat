@@ -54,7 +54,8 @@ const Contact = (props) => {
         .then(res => {
           let formatedContact = {}
           res.forEach(ct => {
-            formatedContact[ct._id] = { name: `${ct.firstname} ${ct.name}`, id: ct._id };
+            if (ct)
+              formatedContact[ct._id] = { name: `${ct.firstname} ${ct.name}`, id: ct._id };
           })
           setcontact(formatedContact);
         });
