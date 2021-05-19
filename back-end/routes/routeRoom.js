@@ -8,6 +8,8 @@ module.exports = (app, conn) => {
   app.route('/room/:id')
     .put(checkAuth, controllerRoom.updateRoom)
     .delete(checkAuth, controllerRoom.deleteRoom);
+  app.route('/room/leave/:id')
+    .get(checkAuth, controllerRoom.leaveRoom)
   app.route('/room/user/:id')
     .get(checkAuth, controllerRoom.getRoomByUser);
   app.route('/room/allow/user/:id')

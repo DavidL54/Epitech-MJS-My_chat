@@ -1,4 +1,5 @@
 const Message = require('../models/modelMessage');
+const moment = require('moment');
 
 exports.createMessage = (req, res) => {
   const message = new Message({
@@ -26,6 +27,26 @@ exports.getLastTenMessage = (req, res) => {
           message[i].created_at = Date.parse(message[i].created_at);
         })
         res.status(200).json(message);
+      }
+    });
+};
+
+exports.getAllMessageByRoomId = (req, res) => {
+  Message.find({ roomid: req.params.roomid }).populate([{ path: 'sender', model: 'User', select: 'name firstname email' }]).sort({ created_at: 'desc' }).lean()
+    .exec()
+    .then((message) => {
+      if (message === null) {
+        res.status(400).send({ error: 'Server was unable to find message' });
+      } else {
+        const resMsg = []
+        message.forEach((msg, i) => {
+          resMsg.push([
+            `${message[i].sender.name} ${message[i].sender.firstname}`,
+            message[i].message,
+            moment(message[i].created_at).format('DD/MM/YYYY hh:mm')
+          ]);
+        })
+        res.status(200).json(resMsg);
       }
     });
 };

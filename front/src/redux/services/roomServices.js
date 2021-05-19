@@ -7,7 +7,8 @@ export const roomServices = {
     deleteRoom,
     getRoomByUser,
     getAllowRoomByUser,
-    updateRoom
+    updateRoom,
+    leaveRoom
 };
 
 function createRoom(body) {
@@ -28,6 +29,14 @@ function updateRoom(id, body) {
 
 function deleteRoom(id) {
     return apiClient.delete(`/room/${id}`)
+        .then(handleResponse)
+        .then(data => {
+            return data
+        })
+}
+
+function leaveRoom(id) {
+    return apiClient.get(`/room/leave/${id}`)
         .then(handleResponse)
         .then(data => {
             return data

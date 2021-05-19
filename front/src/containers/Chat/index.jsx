@@ -75,7 +75,6 @@ const Chat = (props) => {
 						<Contact contact={contact} setcontact={setcontact} selectedRoom={selectedRoom} />
 					</Grid>
 					<Grid className={classes.itemMessage} item xs={8}>
-						<h3>Messages</h3>
 						<div className={classes.message}>
 							<Message className={classes.message} contact={contact} selectedRoom={selectedRoom} />
 						</div>

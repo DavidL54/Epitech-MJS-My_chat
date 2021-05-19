@@ -16,6 +16,7 @@ import Loader from "react-loader-spinner";
 import { sendMessage } from '../../redux/actions/socketAction'
 import { roomServices } from '../../redux/services/roomServices'
 import ClearIcon from '@material-ui/icons/Clear';
+import { toastSuccess, toastError } from "../../redux/actions/alertActions";
 
 
 const Room = (props) => {
@@ -30,12 +31,19 @@ const Room = (props) => {
   }, [])
 
   const leaveRoom = () => {
-    roomServices.deleteRoom(selectedRoom)
+    roomServices.leaveRoom(selectedRoom)
       .then(res => {
-        const newRoomArr = room.filter((item) => { return item._id.toString() !== selectedRoom.toString() })
-        setroom(newRoomArr);
-        setselectedRoom("");
-        setmodalRoom(false);
+        if (res.statusText && res.statusText === "KO") {
+          toastError(res.message)
+          setmodalRoom(false);
+        }
+        else {
+          toastSuccess(res);
+          const newRoomArr = room.filter((item) => { return item._id.toString() !== selectedRoom.toString() })
+          setroom(newRoomArr);
+          setselectedRoom("");
+          setmodalRoom(false);
+        }
       });
   }
 
@@ -48,7 +56,7 @@ const Room = (props) => {
             const color = selectedRoom === con._id ? "#0069B4" : "#5a98c4";
             return (
               <ListItem button style={{ backgroundColor: color, borderRadius: "5px", border: "1px black solid", margin: "5px" }}>
-                { isdamin ? <ListItemIcon ><ClearIcon style={{ color: "red" }} onClick={() => { setselectedRoom(con._id); setmodalRoom(true); }} /></ListItemIcon> : <div />}
+                 <ListItemIcon ><ClearIcon style={{ color: "red" }} onClick={() => { setselectedRoom(con._id); setmodalRoom(true); }} /></ListItemIcon>
                 <ListItemText
                   primary={con.name}
                   onClick={() => setselectedRoom(con._id)}

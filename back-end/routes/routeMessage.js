@@ -7,4 +7,6 @@ module.exports = (app) => {
     .delete(checkAuth, controllerMessage.deleteMessage);
   app.route('/message/:roomid')
     .get(checkAuth, controllerMessage.getLastTenMessage);
+  app.route('/message/all/:roomid')
+    .get(checkAuth, controllerMessage.getAllMessageByRoomId);
 };

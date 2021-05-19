@@ -138,3 +138,40 @@ exports.getAllowRoomByUser = (req, res) => {
       }
     });
 };
+
+exports.leaveRoom = (req, res) => {
+  Room.findById(req.params.id).exec()
+    .then((room, err) => {
+      if (err) {
+        res.status(400).json(err);
+      } else if (room === null) {
+        res.status(400).send({ error: 'Server was unable to find rooms' });
+      } else {
+        const myId = req.userData.userId.toString();
+        if (room.roomAdmin.toString() === myId) {
+          if (room.allowUser.length > 0) {
+            const newAdmin = room.allowUser[0].toString();
+            const newallow = room.allowUser.filter((item) => { return item.toString() !== newAdmin.toString() })
+            room.roomAdmin = newAdmin;
+            room.allowUser = newallow;
+            room.save();
+            res.status(200).json("You have leave room With success");
+          }
+          else {
+            res.status(409).json("You can't leave room because you're alone in this room");
+          }
+        }
+        else if (room.allowUser.includes(myId)) {
+          const newallow = room.allowUser.filter((item) => { return item.toString() !== myId })
+          room.allowUser = newallow;
+          room.save();
+          res.status(200).json("You have leave room With success");
+        }
+        else {
+          res.status(500).json("An error occurs");
+        }
+          
+      }
+    });
+};
+

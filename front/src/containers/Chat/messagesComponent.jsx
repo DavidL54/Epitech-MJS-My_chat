@@ -3,42 +3,20 @@ import { connect } from 'react-redux';
 import "../../scss/Home.scss";
 import {
 	List,
+	IconButton
 } from '@material-ui/core';
 import Loader from "react-loader-spinner";
+import { FaFilePdf, FaFileCsv } from 'react-icons/fa';
 import { SocketContext } from '../App/SocketComponent';
+import FileSaver, { saveAs } from 'file-saver';
 import { sendMessage } from '../../redux/actions/socketAction'
 import { makeStyles } from '@material-ui/core/styles';
 import { chatServices } from '../../redux/services/chatServices'
 import NewReleasesIcon from '@material-ui/icons/NewReleases';
 import Box from '@material-ui/core/Box';
 import moment from 'moment';
-
-const useStyles = makeStyles((theme) => ({
-	item: {
-		backgroundColor: "#cecece",
-		color: "black",
-		border: "1px black solid",
-		margin: '15px',
-		padding: '20px',
-		minHeight: "80vh",
-	},
-	textarea: {
-		backgroundColor: "#cecece",
-		color: "black",
-		border: "1px black solid",
-		margin: '15px',
-		padding: '20px',
-		minHeight: "10vh",
-	},
-	sendbutton: {
-		backgroundColor: "#cecece",
-		color: "black",
-		border: "1px black solid",
-		margin: '15px',
-		padding: '20px',
-		minHeight: "10vh",
-	},
-}));
+import jsPDF from 'jspdf'
+import 'jspdf-autotable';
 
 const Message = (props) => {
 	const { selectedRoom, contact } = props;
@@ -46,7 +24,7 @@ const Message = (props) => {
 	const [roomMessage, setroomMessage] = useState([]);
 	const contactKeys = Object.keys(contact);
 	const socket = useContext(SocketContext);
-	
+
 	useEffect(() => {
 		if (selectedRoom) {
 			chatServices.getLastMessageByRoomId(selectedRoom)
@@ -67,9 +45,66 @@ const Message = (props) => {
 		}
 	}, [props.socket.message, selectedRoom])
 
+	const downloadPdf = () => {
+		chatServices.getAllMessageByRoomId(selectedRoom)
+			.then((res) => {
+
+				const doc = new jsPDF()
+				doc.autoTable({
+					head: [['Author', 'Message', 'Date']],
+					body: res,
+				})
+				doc.save(`History.pdf`);
+			})
+	}
+
+	const downloadCSV = () => {
+		chatServices.getAllMessageByRoomId(selectedRoom)
+			.then((res) => {
+				let csv = '';
+				res.forEach((ex) => {
+					csv += (`${ex[0]};${ex[1].replace(',', '')};${ex[2]};\r\n`);
+				});
+				const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+				FileSaver.saveAs(csvData, 'data.csv');
+			});
+	}
+
 	if (loaded === true) {
 		return (
 			<>
+				<Box display="flex" justifyContent="center" m={1} p={1}>
+					<Box p={1}>
+						<h3>Messages</h3>
+					</Box>
+					<Box>
+						<IconButton
+							onClick={downloadPdf}
+							disabled={roomMessage.length > 0 ? false : true}
+						>
+							<FaFilePdf
+								style={{
+									fontSize: 20,
+									color: roomMessage.length > 0 ? '#F72015' : 'grey',
+								}}
+							/>
+						</IconButton>
+					</Box>
+					<Box>
+						<IconButton
+							onClick={downloadCSV}
+							disabled={roomMessage.length > 0 ? false : true}
+						>
+							<FaFileCsv
+								style={{
+									fontSize: 20,
+									color: roomMessage.length > 0 ? '#3156ea' : 'grey',
+								}}
+							/>
+						</IconButton>
+					</Box>
+				</Box>
 				<List dense={true}>
 					{roomMessage.map(con => {
 						if (con.roomid === selectedRoom) {
@@ -79,7 +114,7 @@ const Message = (props) => {
 							}
 							let newFlag = (<div />)
 
-							if (con.sender !== props.user.userId && con.read && !con.read.includes(props.user.userId)) {
+							if (con.sender !== props.user.userId && con.read && !con.read.includes(props.user.userId) && Date.now() - Date(con.updated_at) > 20) {
 								newFlag = <NewReleasesIcon />;
 							}
 
@@ -90,7 +125,7 @@ const Message = (props) => {
 										<Box display="flex" justifyContent="flex-end" m={1} p={1}>
 											<Box p={1} borderRadius={10} bgcolor="#E0EC8A">
 												<Box>{con.message} {`: Me`}{newFlag}</Box>
-												<Box display="flex" style={{ fontSize: "10px" }} justifyContent="flex-end" >{moment(con.created_at).format('DD/MM/YYYY hh:mm') }</Box>
+												<Box display="flex" style={{ fontSize: "10px" }} justifyContent="flex-end" >{moment(con.created_at).format('DD/MM/YYYY hh:mm')}</Box>
 												<Box display="flex" style={{ fontSize: "10px" }} justifyContent="flex-end" >{read < 0 ? 0 : read} read</Box>
 											</Box>
 										</Box>
@@ -102,7 +137,7 @@ const Message = (props) => {
 										<Box display="flex" justifyContent="flex-start" m={1} p={1}>
 											<Box p={1} borderRadius={10} bgcolor="#AECEE7">
 												<Box>{newFlag}{`${displayName} : `}{con.message}</Box>
-												<Box display="flex" style={{ fontSize: "10px" }} justifyContent="flex-start" >{moment(con.created_at).format('DD/MM/YYYY hh:mm') }</Box>
+												<Box display="flex" style={{ fontSize: "10px" }} justifyContent="flex-start" >{moment(con.created_at).format('DD/MM/YYYY hh:mm')}</Box>
 											</Box>
 										</Box>
 									</div>
