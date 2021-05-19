@@ -2,12 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { connect } from 'react-redux';
 import "../../scss/Home.scss";
 import {
-	TextField,
-	Button,
 	List,
-	ListItem,
-	ListItemText,
-	Grid
 } from '@material-ui/core';
 import Loader from "react-loader-spinner";
 import { SocketContext } from '../App/SocketComponent';
@@ -16,6 +11,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { chatServices } from '../../redux/services/chatServices'
 import NewReleasesIcon from '@material-ui/icons/NewReleases';
 import Box from '@material-ui/core/Box';
+import moment from 'moment';
 
 const useStyles = makeStyles((theme) => ({
 	item: {
@@ -65,8 +61,8 @@ const Message = (props) => {
 						if (!idmsg.includes(msg.idmsg))
 							ret.push(msg)
 					})
-					const reversed = await ret.reverse()
-					setroomMessage(reversed);
+					ret.sort((a, b) => { if (a.created_at <= b.created_at) return -1; return 1; });
+					setroomMessage(ret);
 				})
 		}
 	}, [props.socket.message, selectedRoom])
@@ -94,7 +90,8 @@ const Message = (props) => {
 										<Box display="flex" justifyContent="flex-end" m={1} p={1}>
 											<Box p={1} borderRadius={10} bgcolor="#E0EC8A">
 												<Box>{con.message} {`: Me`}{newFlag}</Box>
-												<Box display="flex" style={{fontSize: "10px"}} justifyContent="flex-end" >{read < 0 ? 0: read} read</Box>
+												<Box display="flex" style={{ fontSize: "10px" }} justifyContent="flex-end" >{moment(con.created_at).format('DD/MM/YYYY hh:mm') }</Box>
+												<Box display="flex" style={{ fontSize: "10px" }} justifyContent="flex-end" >{read < 0 ? 0 : read} read</Box>
 											</Box>
 										</Box>
 									</div>
@@ -105,6 +102,7 @@ const Message = (props) => {
 										<Box display="flex" justifyContent="flex-start" m={1} p={1}>
 											<Box p={1} borderRadius={10} bgcolor="#AECEE7">
 												<Box>{newFlag}{`${displayName} : `}{con.message}</Box>
+												<Box display="flex" style={{ fontSize: "10px" }} justifyContent="flex-start" >{moment(con.created_at).format('DD/MM/YYYY hh:mm') }</Box>
 											</Box>
 										</Box>
 									</div>

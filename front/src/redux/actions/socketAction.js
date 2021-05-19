@@ -28,7 +28,7 @@ export const sendMessage = (socket, roomid, message) => {
   return async (dispatch, getState) => {
     const state = getState();
     const idmsg = await makeRandomId(20);
-    await dispatch({ type: "ADD_MESSAGE", message: { sender: state.user.userId, roomid, message, idmsg } });
+    await dispatch({ type: "ADD_MESSAGE", message: { sender: state.user.userId, roomid, message, idmsg, created_at: Date.now() } });
     socket.emit('message', state.user.userId, roomid, message, idmsg);
   }
 }

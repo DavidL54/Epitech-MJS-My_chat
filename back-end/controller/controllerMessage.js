@@ -22,13 +22,16 @@ exports.getLastTenMessage = (req, res) => {
       if (message === null) {
         res.status(400).send({ error: 'Server was unable to find message' });
       } else {
+        message.forEach((msg, i) => {
+          message[i].created_at = Date.parse(message[i].created_at);
+        })
         res.status(200).json(message);
       }
     });
 };
 
 exports.getLastGlobalMessage = (req, res) => {
-  Message.find({ sender: req.userData.userId }).limit(100).lean().exec()
+  Message.find({ sender: req.userData.userId }).lean().exec()
     .then((message) => {
       if (message === null) {
         res.status(400).send({ error: 'Server was unable to find this invit' });

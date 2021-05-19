@@ -9,11 +9,9 @@ import {
 	Button,
 	Link
 } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
 import { userActions } from '../../redux/actions/userActions';
 import { userServices } from '../../redux/services/userServices';
 import { Redirect } from 'react-router-dom';
-import Cookies from 'universal-cookie';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
