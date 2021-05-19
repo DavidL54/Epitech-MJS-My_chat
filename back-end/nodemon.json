@@ -1,6 +1,0 @@
-{
-  "env": {
-    "JWT_KEY": "secret",
-    "JWT_KEY_RESET": "secret1234"
-  }
-}
