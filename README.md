@@ -4,9 +4,10 @@ D.E.scord is an Epitech project written in Javascript with NodeJS + ReactJS + Mo
 
 The goal of the project is to develop a chat
 
+![](https://github.com/DavidL54/Epitech-MJS-My_chat/blob/main/docimg/presentation.png)
 
-
-Easy configuration file :
+#### Easy configuration file :
+You can define your own config
 
 ```javascript
 const  config  =  {
@@ -23,3 +24,7 @@ const  config  =  {
     "DELAY_BEFORE_NEXT_MAIL":  60,  //delay in minutes (int)
 }
 ```
+
+#### Smart Mail sending scheduled with Agenda :
+
+![](https://github.com/DavidL54/Epitech-MJS-My_chat/blob/main/docimg/email.png)
