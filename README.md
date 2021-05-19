@@ -24,7 +24,32 @@ const  config  =  {
     "DELAY_BEFORE_NEXT_MAIL":  60,  //delay in minutes (int)
 }
 ```
+#### Redux connected Modal with custom questions and responses (based on notistack package)
 
-#### Smart Mail sending scheduled with Agenda :
+![](https://github.com/DavidL54/Epitech-MJS-My_chat/blob/main/docimg/modal.png)
+
+#### Login-SignUp-Recover features
+
+![](https://github.com/DavidL54/Epitech-MJS-My_chat/blob/main/docimg/login.png)
+
+#### Smart Mail sending scheduled with package Agenda :
 
 ![](https://github.com/DavidL54/Epitech-MJS-My_chat/blob/main/docimg/email.png)
+
+#### Instant Chat :
+- Contact section with state of users : online(green) , in app (yellow) or disconnected (grey)
+- Messages sections with message ( with sended date, number read ) and who is typing
+- Room section where we can choose the room we want join or leave room
+- Textarea who support Emoji
+- Instant message refresh based on socket
+
+![](https://github.com/DavidL54/Epitech-MJS-My_chat/blob/main/docimg/chat.png)
+
+#### Room create and Edit :
+
+![](https://github.com/DavidL54/Epitech-MJS-My_chat/blob/main/docimg/room.png)
+
+#### Export conversation :
+You can export conversation in PDF and CSV files
+
+![](https://github.com/DavidL54/Epitech-MJS-My_chat/blob/main/docimg/export.png)
